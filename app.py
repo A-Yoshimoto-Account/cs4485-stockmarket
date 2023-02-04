@@ -1,19 +1,20 @@
-from flask import Flask, render_template, request, redirect
+from flask import Flask, render_template, request, redirect, jsonify, url_for
 
 app = Flask(__name__)
 
 questions = []
 answers = []
 
-@app.route('/', methods=['GET', 'POST'])
+@app.route('/')
 def index():
+	return render_template('index.html')
+
+@app.route('/process_question', methods=['POST', 'GET'])
+def process_question():
 	if request.method == 'POST':
-		question = request.form.get('question')
-		questions.append(question)
-		answers.append(get_model_response(question))
-		return redirect(request.path)
-	if request.method == 'GET':
-		return render_template('index.html', questions=questions, answers=answers, zip=zip)
+		question = request.get_json()['question']
+		answer = get_model_response(question)
+		return jsonify({'question': question, 'answer': answer})
 
 def get_model_response(question):
 	return 'placeholder text'
