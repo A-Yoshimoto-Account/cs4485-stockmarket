@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+	<head lang="en">
+		<meta charset="UTF-8">
+		<title>Index Page</title>
+		<link rel="stylesheet" href="../static/styles.css">
+		<script src="../static/app.js"></script>
+	</head>
+	<body>
+		<p>UI to Interface with GPT-3 Model</p>
+		<p>Please ensure that your OpenAI API key is in an environment variable named OPENAI_API_KEY</p>
+		<div class="text-area large-container" id="chat-area">
+			{% for question, answer in zip(questions, answers) %}
+				<div class="query-response">
+					<div class="user-queries text-block">
+						<p><b>You:</b> {{ question }}</p>
+					</div>
+					<div class="model-responses text-block">
+						<p><b>Response:</b> {{ answer }}</p>
+					</div>
+				</div>
+			{% endfor %}
+		</div>
+		<div class="text-field large-container">
+			<form id="send-query-form" method="post">
+				<label for="text">Talk with GPT-3</label><br>
+				<input class="query-text" type="text" name="question">
+				<input type="submit" value="submit">
+			</form>
+		</div>
+		<div class="large-container">
+			<button type="button">Download conversation as .txt</button>
+		</div>
+	</body>
+</html>

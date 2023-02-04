@@ -1,0 +1,34 @@
+.large-container {
+	margin: 3px;
+	padding: 3px;
+}
+.text-area {
+	border-color: darkgrey;
+	border: solid 5px;
+	width: 75vw;
+	height: 40vh;
+	font-size: 12pt;
+	overflow: auto;
+}
+.query-text {
+	width: 50vw;
+}
+.query-response {
+	margin-top: 1px;
+	margin-bottom: 1px;
+}
+.text-block {
+	display: flex;
+	width: 70wh;
+}
+.text-block p {
+	margin: 0px;
+	word-break: break-all;
+	display: inline-block;
+}
+.user-queries {
+	background-color: lightcyan;
+}
+.model-responses {
+	background-color: lightblue;
+}
