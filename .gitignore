@@ -1,2 +1,2 @@
-
-data_set_gathering/.env
+*.xlsx
+*.env
