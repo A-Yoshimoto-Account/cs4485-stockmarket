@@ -31,24 +31,36 @@ def create_company_articles_workbook(company='Nvidia', filename='sample_fine_tun
 	news_articles = newsapi.get_everything(q=company, language='en') # News Article is a nested dictionary
 
 	# These column titles are necessary for putting the xlsx in a format recognizable by the OpenAI CLI data preparation tool
-	sheet["A1"] = "Article Info"
-	sheet["B1"] = "prompt"
-	sheet["C1"] = "completion"
+	sheet["A1"] = "title"
+	sheet["B1"] = "date_published"
+	sheet["C1"] = "url"
+	sheet["D1"] = "timeout"
+	sheet["E1"] = "content"
+	
 
 	row = 2 # began at the next row
 
 	# extract the article text from each news article, if URL request timesout write information to xlsx
 	for news in news_articles.get('articles'):
 		try :
+			title = news.get('title')
+			date = news.get('publishedAt')
 			url = news.get('url')
-			article = g.extract(url=url)
-			text = article.cleaned_text
-			sheet.cell(row=row, column=1, value = 'Date Published: ' + news.get('publishedAt') + '\nTitle: ' + news.get('title') + '\nURL: ' + news.get('url'))
-			sheet.cell(row=row, column=2, value = 'Date Published: ' + news.get('publishedAt') + '\nContent:\n\n' + text)
-			row += 1
+			content = g.extract(url=url).cleaned_text
+			timeout = False
 		except requests.exceptions.ReadTimeout:
-			sheet.cell(row=row, column=1, value= '**URL TIMEOUT**, \n\n Date Published: ' + news.get('publishedAt') + '\nTitle: ' + news.get('title') + '\nURL: ' + news.get('url'))
-			sheet.cell(row=row, column=2, value = 'Date Published: ' + news.get('publishedAt') + '\nTruncated Content: ' + news.get('content'))
+			title = news.get('title')
+			date = news.get('publishedAt')
+			url = news.get('url')
+			content = news.get('content')
+			timeout = True
+		finally:
+			sheet.cell(row=row, column=1, value = title);
+			sheet.cell(row=row, column=2, value = date);
+			sheet.cell(row=row, column=3, value = url);
+			sheet.cell(row=row, column=4, value = timeout);
+			sheet.cell(row=row, column=5, value = content);
+			
 			row += 1
 
 	workbook.save(filename)
