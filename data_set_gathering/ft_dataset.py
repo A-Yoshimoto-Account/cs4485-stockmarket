@@ -1,6 +1,6 @@
 import os
 import openai
-from dotenv import load_env
+from dotenv import load_dotenv
 import pandas as pd
 import time
 
