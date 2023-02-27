@@ -80,10 +80,10 @@ def generate_qa_finetune_dataset(df, save_to='qa_ft_dataset', contexts_csv='cont
 			print('Saving dataset and fine-tune JSONL')
 		
 		# save original trimmed articles and embeddings
-		contexts.to_csv(contexts_csv)
-		context_embeddings.to_csv(embed_csv)
+		contexts.to_csv(contexts_csv, index=False)
+		context_embeddings.to_csv(embed_csv, index=False)
 		# save all to CSV
-		training_dataset.to_csv(save_to + '.csv')
+		training_dataset.to_csv(save_to + '.csv', index=False)
 		# save prompt-completions to JSONL ready to be sent for fine-tuning
 		training_dataset[['prompt', 'completion']].to_json(save_to + '.jsonl', orient='records', lines=True)
 		
