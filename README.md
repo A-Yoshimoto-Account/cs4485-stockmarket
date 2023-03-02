@@ -11,5 +11,4 @@ flask run
 ```
 The Flask app will be available on http://localhost:5000
 
-The program does not have any connection to the OpenAI API as of yet.
 
