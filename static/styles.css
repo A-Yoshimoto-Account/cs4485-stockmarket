@@ -2,11 +2,24 @@
 	margin: 3px;
 	padding: 3px;
 }
+.header-area * {
+	margin-bottom: 0px;
+}
+.header-area h3 {
+	margin-top: 5px;
+}
+.param-area * {
+	margin-top: 0px;
+	margin-bottom: 0px;
+}
+#kSimRange {
+	margin-bottom: 5px;
+}
 .text-area {
 	border-color: darkgrey;
 	border: solid 5px;
 	width: 75vw;
-	height: 40vh;
+	height: 50vh;
 	font-size: 12pt;
 	overflow: auto;
 }

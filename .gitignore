@@ -4,3 +4,7 @@
 *.csv
 *.jsonl
 *.env
+.*/
+build/*
+dist/*
+*egg-info/*

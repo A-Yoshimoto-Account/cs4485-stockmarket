@@ -29,9 +29,9 @@ function downloadConvo() {
 	let type = {type: 'text/csv;charset=utf-8'};
 	let data = getConversation();
 	let file = new Blob([data], type=type);
-
+	let modelName = document.getElementById('modelName').innerHTML;
 	let now = getDateTimeNow();	
-	let filename = 'gpt3convo_' + now + '.csv'
+	let filename = modelName + '_' + now + '.csv'
 	let url = URL.createObjectURL(file);
 
 	let downloadLink = document.createElement('a');
