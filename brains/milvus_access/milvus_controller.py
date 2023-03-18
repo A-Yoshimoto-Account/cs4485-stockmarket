@@ -25,7 +25,7 @@ class _TableController:
 	def _check_collection_loaded(func):
 		def wrapper(self, *args, **kwargs):
 			self.check_collection_loaded()
-			func(self, *args, **kwargs)
+			return func(self, *args, **kwargs)
 		return wrapper
 
 	def check_collection_loaded(self):
@@ -97,7 +97,6 @@ class TextEmbeddingTableController(_TableController):
 			output_fields=[self.text_col],
 			consistency_level="Strong"
 		)
-		resp: list[str] = [res[self.text_col] for res in results]
-		print(resp)
+		resp = [res[self.text_col] for res in results]
 		return resp
 
