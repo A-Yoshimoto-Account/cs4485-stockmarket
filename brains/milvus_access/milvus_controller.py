@@ -1,10 +1,5 @@
 from pymilvus import connections, Collection, utility
 
-ALIAS = 'default'
-HOST = 'localhost'
-PORT = 19530
-
-
 def connect(alias, host, port):
 	connections.connect(
 		alias=alias,

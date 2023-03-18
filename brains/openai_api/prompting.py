@@ -10,12 +10,16 @@ class OpenAIPromptCreator:
         self.prompt_suffix = None if 'prompt_suffix' not in kwargs else kwargs['prompt_suffix']
         self.completion_stopping = None if 'completion_stopping' not in kwargs else kwargs['completion_stopping']
 
-    def create_chat_messages(self, question: str, context: str, memory: dict) ->  list[dict]:
-        messages = []
-        messages.append({
+    def create_chat_messages(
+            self,
+            question: str,
+            context: str,
+            memory: list[dict[str, str]]
+    ) ->  list[dict]:
+        messages = [{
             'role': 'system',
             'content': self.system
-        })
+        }]
         for interaction in memory:
             messages.append({
                 'role': 'user',

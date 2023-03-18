@@ -13,7 +13,7 @@ class QueryRefiner:
             model: str,
             question: str,
             context_list: list[str],
-            memory: dict[str, str],
+            memory: list[dict[str, str]],
             **kwargs
     ) -> str:
         if type not in REFINE_TYPES:
@@ -38,7 +38,7 @@ class QueryRefiner:
             model: str,
             question: str,
             context_list: list[str],
-            memory: dict[str, str],
+            memory: list[dict[str, str]],
             **kwargs
     ) -> str:
         first_context = context_list[0]

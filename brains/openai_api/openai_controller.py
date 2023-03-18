@@ -76,7 +76,7 @@ class OpenAIController:
             model: str,
             question: str,
             context: str,
-            memory: dict[str, str],
+            memory: list[dict[str, str]],
     ) -> str:
         if self.disable:
             return OpenAIController._placeholder_response(question)

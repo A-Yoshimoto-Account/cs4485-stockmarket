@@ -5,22 +5,26 @@ import brains.milvus_access.milvus_controller as milvus
 from brains.openai_api.query_refiner import QueryRefiner
 
 class ModelController:
-	def __init__(self, disable: bool):
+	def __init__(self, disable: bool = False):
 		self.openai = openai_api.OpenAIController(os.getenv(constants.OPENAI_ENV_VAR), disable=disable)
+
+		milvus.connect(alias=constants.ALIAS, host=constants.HOST, port=constants.PORT)
 		self.milvus_access = milvus.TextEmbeddingTableController(
 			name=constants.CONTEXTS_TABLE,
 			primary_key=constants.CONTEXTS_PK,
 			text_col=constants.CONTEXTS_TEXT_COL,
 			embed_col=constants.CONTEXTS_EMBED_COL
 		)
-	
-	def ask_question(self,
-		answering_endpoint,
-		answering_model,
-		question,
-		ksim=1,
-		memory=[],
-		refine=None,
+		self.milvus_access.load_collection()
+
+	def ask_question(
+			self,
+			answering_endpoint: str,
+			answering_model: str,
+			question: str,
+			ksim: int = 1,
+			memory: list[dict[str, str]] = [],
+			refine: str = None,
 	):
 		# need to change:
 		# 1. get embeds of question with OpenAIController
@@ -33,3 +37,7 @@ class ModelController:
 		if not refine:
 			return self.openai.access_model(answering_endpoint, answering_model, question=question, ksim=most_similar_contexts[0], memory=memory)
 		return QueryRefiner.query(self.openai, refine, answering_endpoint, answering_model, question, most_similar_contexts, memory)
+
+	def teardown(self):
+		self.milvus_access.release_collection()
+		milvus.disconnect(constants.ALIAS)
