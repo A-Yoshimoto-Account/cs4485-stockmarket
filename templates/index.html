@@ -14,9 +14,9 @@
 		<hr>
 		<div class="large-container param-area">
 			<p>k Similarity: <span label="kSimLabel">3</span></p>
-			<input type="range" min="1" max="7" value="3" class="slider" id="kSimRange">
-			<p>Conversation memory: <span label="memoryLabel">5</span></p>
-			<input type="range" min="1" max="10" value="5" class="slider" id="memoryRange">
+			<input type="range" min="1" max="5" value="3" class="slider" id="kSimRange" oninput="updateKSimValue()">
+			<p>Conversation memory: <span label="memoryLabel">3</span></p>
+			<input type="range" min="1" max="5" value="3" class="slider" id="memoryRange" oninput="updateMemoryValue()">
 		</div>
 		<div class="text-area large-container" id="chat-area">
 		</div>
@@ -32,8 +32,8 @@
 			<button type="button" onclick="uploadSavedConvo()">Upload saved conversation</button>
 		</div>
 		<div class="large-container">
-			<button type="button" onclick="startNewTopic()">Start new topic</button>
-			<button type="button" onclick="resetConvo()">Reset conversation</button>
+			<button type="button" onclick="clearMemory()">Clear convo memory</button>
+			<button type="button" onclick="clearAll()">Clear conversation</button>
 		</div>
 		<hr>
 		<div class="large-container footer-area">

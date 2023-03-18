@@ -89,7 +89,7 @@ class TextEmbeddingTableController(_TableController):
 			expr=f"{self.primary_key} in {res_ids[0].ids}",
 			offset=0,
 			limit=limit,
-			output_fields=[self.primary_key, self.text_col],
+			output_fields=[self.text_col],
 			consistency_level="Strong"
 		)
 		return results

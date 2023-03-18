@@ -1,4 +1,5 @@
 import openai
+from brains.openai_api.prompting import OpenAIPromptCreator
 
 # edit to make it access OpenAI once, instead of multiple times
 
@@ -12,57 +13,83 @@ EMBEDDING_MODELS = ['text-embedding-ada-002']
 CHATCOMPLETION_MODELS = ['gpt-3.5-turbo']
 COMLPETION_MODELS = ['text-davinci-003', 'text-curie-001']
 
+
 class OpenAIController:
-	def __init__(self, api_key, disable=False):
-		openai.api_key = api_key
-		self.disable = disable
-	
-	def access_model(self, endpoint, model, text, **kwargs):
-		if endpoint not in ENDPOINTS:
-			raise Exception(f'{endpoint} endpoint is not supported')
+    def __init__(self, api_key: str, disable: bool = False, **kwargs):
+        openai.api_key = api_key
+        self.disable = disable
+        self.prompter = OpenAIPromptCreator(**kwargs)
 
-		if endpoint == CHATCOMPLETION or endpoint == COMPLETION:
-			ksim = kwargs['ksim']
-			memory = kwargs['memory']
-			refine = kwargs['refine']
-			return self._chat_completion(text, ksim, memory, refine, **kwargs)
-		elif endpoint == COMPLETION:
-			model_id = kwargs['model_id']
-			ksim = kwargs['ksim']
-			memory = kwargs['memory']
-			refine = kwargs['refine']
-			return self._completion(text, model_id, ksim, memory, refine, **kwargs)
-		elif endpoint == EMBEDDING:
-			return self._embedding(text, **kwargs)
+    def access_model(
+            self,
+            endpoint: str,
+            model: str,
+            **kwargs
+    ):
+        if endpoint not in ENDPOINTS:
+            raise Exception(f'{endpoint} endpoint is not supported')
 
-	def _embedding(self, text: str, **kwargs) -> list[int]:
-		if not self.disable:
-			return [0] * EMBEDDING_LENGTH
-		return []
-	
-	def _chat_completion(self,
-		question,
-		ksim: int =1,
-		memory: list =[],
-		refine: str =None,
-		**kwargs,
-	) -> dict:
-		if not self.disable:
-			return OpenAIController._placeholder_response(question)
-		return {}
-	
-	def _completion(self,
-		question: str,
-		ksim: int =0,
-		memory: list =[],
-		refine: str =None,
-		**kwargs,
-	) -> dict:
-		if not self.disable:
-			return OpenAIController._placeholder_response(question)
-		return {}
+        if endpoint == EMBEDDING:
+            if 'text' not in kwargs:
+                raise Exception('Embeddings endpoint needs a parameter "text"')
+            return self._embedding(model, kwargs['text'])
+        elif endpoint == COMPLETION:
+            if 'question' not in kwargs or 'context' not in kwargs:
+                raise Exception('ChatCompletions endpoint needs parameters "question", "context"')
+            return self._completion(model, kwargs['question'], kwargs['context'])
+        elif endpoint == CHATCOMPLETION:
+            if 'question' not in kwargs or 'context' not in kwargs or 'memory' not in kwargs:
+                raise Exception('ChatCompletions endpoint needs parameters "question", "context", "memory"')
+            return self._chat_completion(model, kwargs['question'], kwargs['context'], kwargs['memory'])
 
-	def _placeholder_response(question: str):
-		return {'question': question, 'answer': 'placeholder answer'}
+    def _embedding(
+            self,
+            model: str,
+            text: str
+    ) -> list[int]:
+        if self.disable:
+            return [0] * EMBEDDING_LENGTH
+        resp = openai.Embedding.create(
+            model=model,
+            input=text,
+        )
+        return [data['embedding'] for data in resp['data']]
 
-	_placeholder_response = staticmethod(_placeholder_response)
+    def _completion(
+            self,
+            model: str,
+            question: str,
+            context: str,
+    ) -> str:
+        if self.disable:
+            return OpenAIController._placeholder_response(question)
+
+        prompt = self.prompter.create_completion_prompt(question, context)
+        resp = openai.Completion.create(
+            model=model,
+            prompt=prompt,
+        )
+        return resp['choices'][0]['text']
+
+    def _chat_completion(
+            self,
+            model: str,
+            question: str,
+            context: str,
+            memory: dict[str, str],
+    ) -> str:
+        if self.disable:
+            return OpenAIController._placeholder_response(question)
+        messages = self.prompter.create_chat_messages(question, context, memory)
+        resp = openai.ChatCompletion.create(
+            model=model,
+            messages=messages,
+        )
+        return resp['choices'][0]['message']['content']
+
+    def _placeholder_response(
+            question: str
+    ) -> str:
+        return 'placeholder answer'
+
+    _placeholder_response = staticmethod(_placeholder_response)

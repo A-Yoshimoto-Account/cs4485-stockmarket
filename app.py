@@ -4,7 +4,7 @@ from app_helper import ModelController
 
 app = Flask(__name__)
 app.config.from_object('config')
-controller = ModelController()
+controller = ModelController(app.config['DISABLE_OPENAI'])
 
 conversation = []
 
@@ -20,9 +20,8 @@ def process_question():
 		question = req_params.get('question', '')
 		ksim = req_params.get('ksim', 1)
 		memory = req_params.get('memory', 0)
-		refine = req_params.get('refine', 'list')
 		
-		answer = get_model_response(question, ksim=ksim, memory=memory, refine=refine)
+		answer = get_model_response(question, ksim=ksim, memory=memory, refine=app.config['REFINE'])
 		
 		conversation.append({'question': question, 'answer': answer})
 		
@@ -32,7 +31,7 @@ def get_model_response(
 		question,
 		ksim=1,
 		memory=0,
-		refine='list',
+		refine=None,
 	):
 	prev_questions = conversation[:-memory]
 	return controller.ask_question(app.config['ENDPOINT'], app.config['GPT_MODEL'], question, ksim=ksim, memory=prev_questions, refine=refine)
