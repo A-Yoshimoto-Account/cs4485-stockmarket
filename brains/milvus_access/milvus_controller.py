@@ -1,3 +1,5 @@
+from typing import List, Any
+
 from pymilvus import connections, Collection, utility
 
 def connect(alias, host, port):
@@ -6,7 +8,6 @@ def connect(alias, host, port):
 		host=host,
 		port=port
 	)
-
 
 def disconnect(alias):
 	connections.disconnect(alias)
@@ -64,13 +65,22 @@ class TextEmbeddingTableController(_TableController):
 		self.embed_col = embed_col
 
 	@_TableController._check_collection_loaded
-	def insert(self, text_list: list, embedding_list: list):
+	def insert(
+			self,
+			text_list: list,
+			embedding_list: list
+	):
 		data = [text_list, embedding_list]
 		resp = self.collection.insert(data)
 		return resp
 
 	@_TableController._check_collection_loaded
-	def get_similar_contexts(self, query_embeds: list, nprobe=16, limit=15):
+	def get_similar_contexts(
+			self,
+			query_embeds: list,
+			nprobe: int = 16,
+			limit: int = 15
+	) -> list:
 		search_params = {"metric_type": "IP", "params": {"nprobe": nprobe}, "offset": 0}
 		res_ids = self.collection.search(
 			data=query_embeds, 
@@ -78,7 +88,7 @@ class TextEmbeddingTableController(_TableController):
 			param=search_params,
 			limit=limit,
 			expr=None,
-			consistency_level="Strong"
+			consistency_level="Strong",
 		)
 		results = self.collection.query(
 			expr=f"{self.primary_key} in {res_ids[0].ids}",
@@ -87,4 +97,7 @@ class TextEmbeddingTableController(_TableController):
 			output_fields=[self.text_col],
 			consistency_level="Strong"
 		)
-		return results
+		resp: list[str] = [res[self.text_col] for res in results]
+		print(resp)
+		return resp
+

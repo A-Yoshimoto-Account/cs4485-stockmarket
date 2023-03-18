@@ -18,8 +18,8 @@ def process_question():
 		req_params = request.get_json()
 		
 		question = req_params.get('question', '')
-		ksim = req_params.get('ksim', 1)
-		memory = req_params.get('memory', 0)
+		ksim = int(req_params.get('ksim', 1))
+		memory = int(req_params.get('memory', 0))
 		
 		answer = get_model_response(question, ksim=ksim, memory=memory, refine=app.config['REFINE'])
 		

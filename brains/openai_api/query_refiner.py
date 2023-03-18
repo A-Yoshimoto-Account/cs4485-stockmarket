@@ -1,7 +1,10 @@
+import random
+
 from brains.openai_api.openai_controller import COMPLETION
 from brains.openai_api.openai_controller import OpenAIController
 
 REFINE_TYPES = ['list']
+
 
 # implement LlamaIndex list index for refining queries to OpenAI
 # called by ModelController
@@ -41,6 +44,7 @@ class QueryRefiner:
             memory: list[dict[str, str]],
             **kwargs
     ) -> str:
+        random.shuffle(context_list)
         first_context = context_list[0]
         context_answer = openai_controller.access_model(
             endpoint=endpoint,
@@ -64,8 +68,6 @@ class QueryRefiner:
             )
 
         return context_answer
-
-
 
     query = staticmethod(query)
     _list_query = staticmethod(_list_query)

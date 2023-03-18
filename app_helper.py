@@ -26,18 +26,31 @@ class ModelController:
 			memory: list[dict[str, str]] = [],
 			refine: str = None,
 	):
-		# need to change:
-		# 1. get embeds of question with OpenAIController
-		# 2. get most sim contexts to questions with milvus_controller
-		# 3, use OpenAIController to get answer with endpoint and model
+		# get embeddings of question with OpenAIController
 		q_embeds = self.openai.access_model(openai_api.EMBEDDING, openai_api.EMBEDDING_MODELS[0], text=question)
-		most_similar_contexts = self.milvus_access.get_similar_contexts(query_embeds=[q_embeds])
+		# get most similar contexts with Milvus controller
+		most_similar_contexts: list[str] = self.milvus_access.get_similar_contexts(query_embeds=[q_embeds])
+		print(most_similar_contexts)
 		if len(most_similar_contexts) > ksim:
 			most_similar_contexts = most_similar_contexts[:ksim]
+		# if no refiner is specified, directly call OpenAI
 		if not refine:
-			return self.openai.access_model(answering_endpoint, answering_model, question=question, ksim=most_similar_contexts[0], memory=memory)
-		return QueryRefiner.query(self.openai, refine, answering_endpoint, answering_model, question, most_similar_contexts, memory)
+			return self.openai.access_model(
+				answering_endpoint,
+				answering_model,
+				question=question,
+				ksim=most_similar_contexts[0],
+				memory=memory
+			)
+		# if a refiner is specified, use QueryRefiner
+		return QueryRefiner.query(
+			self.openai,
+			refine,
+			answering_endpoint,
+			answering_model,
+			question,
+			most_similar_contexts,
+			memory
+		)
 
-	def teardown(self):
-		self.milvus_access.release_collection()
-		milvus.disconnect(constants.ALIAS)
+
