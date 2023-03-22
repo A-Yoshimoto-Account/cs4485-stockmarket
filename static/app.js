@@ -1,6 +1,17 @@
+function updateKSimValue() {
+    let newKSim = document.getElementById('kSimRange').value;
+    document.querySelector("span[label='kSimLabel']").innerHTML = newKSim;
+}
+function updateMemoryValue() {
+    let newMemoryVal = document.getElementById('memoryRange').value;
+    document.querySelector("span[label='memoryLabel']").innerHTML = newMemoryVal;
+}
+
 function updateTextArea() {
 	let data = {
-		'question': document.querySelector("input[name='question']").value
+		'question': document.querySelector("input[name='question']").value,
+		'ksim': document.getElementById('kSimRange').value,
+		'memory': document.getElementById('memoryRange').value,
 	};
 	console.log(data);
 	const url = '/process_question';
@@ -25,13 +36,14 @@ function updateTextArea() {
 			chatArea.scrollTop = chatArea.scrollHeight;
 		})
 }
+
 function downloadConvo() {
 	let type = {type: 'text/csv;charset=utf-8'};
 	let data = getConversation();
 	let file = new Blob([data], type=type);
-
+	let modelName = document.getElementById('modelName').innerHTML;
 	let now = getDateTimeNow();	
-	let filename = 'gpt3convo_' + now + '.csv'
+	let filename = modelName + '_' + now + '.csv'
 	let url = URL.createObjectURL(file);
 
 	let downloadLink = document.createElement('a');
@@ -67,4 +79,16 @@ function getDateTimeNow() {
 	seconds = d.getSeconds();
 
 	return year + '-' + month + '-' + day + '_' + hour + ':' + minute + ':' + seconds;
+}
+
+function uploadSavedConvo() {
+    console.log("Upload a saved convo CSV as memory")
+}
+
+function clearMemory() {
+    console.log("Clears the interval convo memory")
+}
+
+function clearAll() {
+    console.log("Clears the screen and the internal convo memory");
 }
