@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 	<head lang="en">
 		<meta charset="UTF-8">
-		<title>Index Page</title>
+		<title>Stock Chatbot</title>
+		<link rel="shortcut icon" type="image/webp" href="{{ url_for('static', filename='favicon.webp') }}">
 		<link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 		<script src="{{ url_for('static', filename='app.js') }}"></script>
 	</head>
@@ -14,26 +15,29 @@
 		<hr>
 		<div class="large-container param-area">
 			<p>k Similarity: <span label="kSimLabel">3</span></p>
-			<input type="range" min="1" max="5" value="3" class="slider" id="kSimRange" oninput="updateKSimValue()">
+			<input autocomplete="off" type="range" min="1" max="5" value="3" class="slider" id="kSimRange" oninput="updateKSimValue()">
 			<p>Conversation memory: <span label="memoryLabel">3</span></p>
-			<input type="range" min="1" max="5" value="3" class="slider" id="memoryRange" oninput="updateMemoryValue()">
+			<input autocomplete="off" type="range" min="1" max="5" value="3" class="slider" id="memoryRange" oninput="updateMemoryValue()">
 		</div>
 		<div class="text-area large-container" id="chat-area">
 		</div>
 		<div class="text-field large-container">
 			<form id="send-query-form" onsubmit="return false;">
-				<label for="text">Talk with the model</label><br>
-				<input class="query-text" type="text" name="question">
+				<label for="html">Talk with the model</label><br>
+				<input autocomplete="off" class="query-text" type="text" name="question">
 				<input type="submit" value="Submit" onclick="updateTextArea()">
 			</form>
 		</div>
 		<div class="large-container">
 			<button type="button" onclick="downloadConvo()">Download conversation as CSV file</button>
-			<button type="button" onclick="uploadSavedConvo()">Upload saved conversation</button>
+		</div>
+		<div class="large-container">
+			<input type="file" autocomplete="off" id="savedConvoFile" value="Select saved convo">
+			<button type="button" onclick="uploadSavedConvo()">Upload file as conversation memory</button>
 		</div>
 		<div class="large-container">
 			<button type="button" onclick="clearMemory()">Clear convo memory</button>
-			<button type="button" onclick="clearAll()">Clear conversation</button>
+			<button type="button" onclick="clearAll()">Clear convo memory and screen</button>
 		</div>
 		<hr>
 		<div class="large-container footer-area">
