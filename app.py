@@ -4,7 +4,7 @@ from app_helper import ModelController
 
 app = Flask(__name__)
 app.config.from_object('config')
-controller = ModelController(app.config['DISABLE_OPENAI'])
+controller = ModelController(app.config['DISABLE_EMBEDDINGS'], app.config['DISABLE_COMPLETIONS'])
 
 conversation = []
 
