@@ -18,7 +18,7 @@ class OpenAIPromptCreator:
     ) ->  list[dict]:
         messages = [{
             'role': 'system',
-            'content': self.system
+            'content': f'{self.system}'
         }]
         for interaction in memory:
             messages.append({
