@@ -82,7 +82,8 @@ function getDateTimeNow() {
 }
 
 function uploadSavedConvo() {
-    console.log("Upload a saved convo CSV as memory")
+    let convoFile = document.getElementById("savedConvoFile").files[0];
+    console.log("Uploaded " + convoFile.name + " as convo memory");
 }
 
 function clearMemory() {
