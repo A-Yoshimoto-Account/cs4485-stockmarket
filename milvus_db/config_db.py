@@ -6,6 +6,7 @@
 from pymilvus import connections, Collection, CollectionSchema, FieldSchema
 import configparser
 import schemas
+import pandas as pd
 
 config_file = 'db-connection.ini'
 dbconn_configs = configparser.ConfigParser()
@@ -63,47 +64,33 @@ def create_tables():
 				index_params=index_params
 			)
 
-	# # contexts table schema
-	# context_id = FieldSchema(
-		# name='context_id',
-		# dtype=DataType.INT64,
-		# is_primary=True,
-		# auto_id=True
-	# )
-	# context_text = FieldSchema(
-		# name='context_text',
-		# dtype=DataType.VARCHAR,
-		# max_length=6000
-	# )
-	# context_embeds = FieldSchema(
-		# name='context_embeds',
-		# dtype=DataType.FLOAT_VECTOR,
-		# dim=1536
-	# )
+		print('Created table')
+		print(collection)
+		print()
 
-	# # create a table in the DB
-	# collection_name = 'contexts'
-	# schema = CollectionSchema(
-		# fields=[context_id, context_text, context_embeds],
-		# description='Context embeddings search'
-	# )
-	# collection = Collection(
-		# name=collection_name,
-		# schema=schema,
-		# using='default',
-	# )
+def populate_table(table_name: str, text_df: pd.DataFrame, embed_df: pd.DataFrame):
+	col = Collection(table_name)
+	context_list = []
+	embed_list = []
 
-	# # create index on embeddings field
-	# index_params = {
-		# 'metric_type': 'IP',
-		# 'index_type': 'IVF_FLAT',
-		# 'params': {'nlist': 1024}
-	# }
-	# collection.create_index(
-		# field_name='context_embeds',
-		# index_params=index_params
-	# )
+	for i, row in text_df.iterrows():
+		context_list.append(row['context'])
+		embed_list.append(embed_df.iloc[i].values)
 
-connect_to_db()
-create_tables()
-disconnect_from_db()
+	data = [context_list, embed_list]
+	resp = col.insert(data)
+	print('Inserted data')
+	print(resp)
+	print()
+
+def main():
+	connect_to_db()
+	create_tables()
+	text_df = pd.read_csv('initial_data/test_contexts.csv')
+	embed_df = pd.read_csv('initial_data/test_embeds.csv')
+	populate_table('context_embeddings', text_df, embed_df)
+	disconnect_from_db()
+
+
+if __name__ == '__main__':
+	main()
