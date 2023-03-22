@@ -31,9 +31,9 @@ class ModelController:
 			refine: str = None,
 	):
 		# get embeddings of question with OpenAIController
-		q_embeds = self.openai.access_model(openai_api.EMBEDDING, openai_api.EMBEDDING_MODELS[0], text=question)
+		q_embed_list = self.openai.access_model(openai_api.EMBEDDING, openai_api.EMBEDDING_MODELS[0], text=question)
 		# get most similar contexts with Milvus controller
-		most_similar_contexts: list[str] = self.milvus_access.get_similar_contexts(query_embeds=[q_embeds])
+		most_similar_contexts: list[str] = self.milvus_access.get_similar_contexts(query_embeds=q_embed_list)
 		if len(most_similar_contexts) > ksim:
 			most_similar_contexts = most_similar_contexts[:ksim]
 		# if no refiner is specified, directly call OpenAI
