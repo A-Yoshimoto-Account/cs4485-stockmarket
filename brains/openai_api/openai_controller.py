@@ -49,7 +49,7 @@ class OpenAIController:
             text: str
     ) -> list[int]:
         if self.disable_embeds:
-            return [0] * EMBEDDING_LENGTH
+            return [[0] * EMBEDDING_LENGTH]
         resp = openai.Embedding.create(
             model=model,
             input=text,
