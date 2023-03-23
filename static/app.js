@@ -15,7 +15,7 @@ function updateTextArea() {
 		'memory': document.getElementById('memoryRange').value,
 	};
 	console.log(data);
-	
+
 	//Sets endpoint
 	const url = '/process_question';
 	
@@ -91,15 +91,46 @@ function uploadSavedConvo() {
 }
 
 function clearMemory() {
-	console.log("Clears the interval convo memory");
+	console.log("Clears the internal convo memory");
+
+	//Clears internal memory using 'clear_memory()'
 	const url = '/clear_memory';
 	fetch(url, {
 		'method': 'POST',
 		'headers': {'Content-Type': 'application/json'}
-		// 'body': JSON.stringify(data)
 	})
+	let html = 
+				'<div class="system-message">' + 
+				'	<div class="system-messages text-block">' + 
+				'		<b>System:&nbsp</b><p>Your Current Conversation Memory has been cleared.</p>' +
+				'	</div>' +
+				'</div>';
+			let chatArea = document.getElementById('chat-area');
+			chatArea.innerHTML += html;
+			chatArea.scrollTop = chatArea.scrollHeight;
+	
 }
 
 function clearAll() {
     console.log("Clears the screen and the internal convo memory");
+
+	//Clears internal memory using same function as 'clearMemory()'
+	const url = '/clear_memory';
+	fetch(url, {
+		'method': 'POST',
+		'headers': {'Content-Type': 'application/json'}
+	})
+
+	//informs user that entire conversation has been cleared with 5 second popup.
+	let chatArea = document.getElementById('chat-area');
+	chatArea.innerHTML = "";
+	let html = 
+				'<div class="system-message">' + 
+				'	<div class="system-messages text-block">' + 
+				'		<b>System:&nbsp</b><p>Your Entire Conversation has been cleared.</p>' +
+				'	</div>' +
+				'</div>';
+	chatArea.innerHTML += html;
+	chatArea.scrollTop = chatArea.scrollHeight;
+	setTimeout(function() {document.getElementById('chat-area').innerHTML = '';} , 5000);
 }

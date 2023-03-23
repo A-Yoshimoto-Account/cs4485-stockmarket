@@ -21,7 +21,7 @@
 		<div class="text-area large-container" id="chat-area">
 		</div>
 		<div class="text-field large-container">
-			<form id="send-query-form" onsubmit="return false;">
+			<form id="send-query-form" onsubmit="this.reset();return false;">
 				<label for="text">Talk with the model</label><br>
 				<input class="query-text" type="text" name="question">
 				<input type="submit" value="Submit" onclick="updateTextArea()">
@@ -32,8 +32,8 @@
 			<button type="button" onclick="uploadSavedConvo()">Upload saved conversation</button>
 		</div>
 		<div class="large-container">
-			<button type="button" onclick="clearMemory()">Clear convo memory</button>
-			<button type="button" onclick="clearAll()">Clear conversation</button>
+			<button type="button" onclick="clearMemory()">Clear Current Conversation Memory</button>
+			<button type="button" onclick="clearAll()">Clear Entire Conversation</button>
 		</div>
 		<hr>
 		<div class="large-container footer-area">
