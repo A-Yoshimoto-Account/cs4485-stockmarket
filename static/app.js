@@ -7,6 +7,7 @@ function updateMemoryValue() {
     document.querySelector("span[label='memoryLabel']").innerHTML = newMemoryVal;
 }
 
+// Submit key function
 function updateTextArea() {
 	let data = {
 		'question': document.querySelector("input[name='question']").value,
@@ -14,7 +15,11 @@ function updateTextArea() {
 		'memory': document.getElementById('memoryRange').value,
 	};
 	console.log(data);
+	
+	//Sets endpoint
 	const url = '/process_question';
+	
+	//calls the endpoint
 	fetch(url, {
 		'method': 'POST',
 		'headers': {'Content-Type': 'application/json'},
@@ -82,11 +87,17 @@ function getDateTimeNow() {
 }
 
 function uploadSavedConvo() {
-    console.log("Upload a saved convo CSV as memory")
+    console.log("Upload a saved convo CSV as memory");
 }
 
 function clearMemory() {
-    console.log("Clears the interval convo memory")
+	console.log("Clears the interval convo memory");
+	const url = '/clear_memory';
+	fetch(url, {
+		'method': 'POST',
+		'headers': {'Content-Type': 'application/json'}
+		// 'body': JSON.stringify(data)
+	})
 }
 
 function clearAll() {
