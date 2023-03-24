@@ -32,6 +32,11 @@ def process_question():
 
 @app.route('/upload_convo', methods=['POST'])
 def upload_convo():
+	'''
+	Receives textual data and parses it as a CSV.
+	Overwrites the conversation global list with the CSVs contents, if successful.
+	Returns a JSON object containing a message type, a message, and a boolean indicating success/failure.
+	'''
 	req_params = request.get_json()
 	conversation.clear()
 

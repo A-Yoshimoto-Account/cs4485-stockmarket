@@ -85,8 +85,20 @@ function getDateTimeNow() {
 	return year + '-' + month + '-' + day + '_' + hour + ':' + minute + ':' + seconds;
 }
 
+/**
+ * Reads the file stored in the file input and sends its text content to the
+ * 	/upload_convo endpoint.
+ * The expected file is a CSV with the format: "question,answer"
+ * Receives a response JSON object with a message type, message, and a boolean indicating success/failure.
+ * On success, the text area is replaced with the contents of the file.
+ * On failure, it will not populate the text area at all.
+ * The system message will be appended at the end of the text area.
+ * 
+ * @returns null
+ */
 function uploadSavedConvo() {
     const convoFile = document.getElementById("savedConvoFile").files[0];
+	// does nothing if no file exists
 	if (convoFile == null) {
 		return;
 	}
@@ -94,6 +106,7 @@ function uploadSavedConvo() {
 
 	let csvReader = new FileReader();
 	csvReader.onload = function() {
+		// retrieve text of file
 		const fileText = csvReader.result
 		const url = '/upload_convo';
 		fetch(
@@ -106,13 +119,16 @@ function uploadSavedConvo() {
 		).then(response => response.json())
 		.then(resp => {
 			let chatArea = document.getElementById('chat-area');
+			// on success, populate text area with file's contents
 			if (resp['ok']) {
+				chatArea.innerHTML = '';
 				rows = fileText.split('\n');
 				rows.forEach((row) => {
 					content = row.split(',');
 					chatArea.innerHTML += createConvoElement(content[0], content[1]);	
 				})
 			}
+			// append the system message
 			chatArea.innerHTML += createSystemMessage(resp['type'], resp['message']);
 			chatArea.scrollTop = chatArea.scrollHeight;
 		})
@@ -128,7 +144,13 @@ function clearMemory() {
 function clearAll() {
     console.log("Clears the screen and the internal convo memory");
 }
-
+/**
+ * Takes in a system message type and a system message to
+ * 	return HTML for a system message block in the text area
+ * @param {String} type 
+ * @param {String} message 
+ * @returns String
+ */
 function createSystemMessage(type, message) {
 	return 	'<div class="system-message">' + 
 			'	<div class="system-messages ' + type + ' text-block">' + 
@@ -136,6 +158,13 @@ function createSystemMessage(type, message) {
 			'	</div>' + 
 			'</div>';
 }
+/**
+ * Takes in a question and answer to
+ * 	return HTML for a QA block in the text area
+ * @param {String} question 
+ * @param {String} answer 
+ * @returns String
+ */
 function createConvoElement(question, answer) {
 	return 	'<div class="query-response">' + 
 			'	<div class="user-queries text-block">' + 
