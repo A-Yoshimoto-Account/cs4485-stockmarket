@@ -7,6 +7,10 @@ function updateMemoryValue() {
     document.querySelector("span[label='memoryLabel']").innerHTML = newMemoryVal;
 }
 
+/*
+Connected to Submit button
+
+*/
 function updateTextArea() {
 	let data = {
 		'question': document.querySelector("input[name='question']").value,

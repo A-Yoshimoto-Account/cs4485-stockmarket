@@ -15,7 +15,7 @@ def index():
 @app.route('/process_question', methods=['POST', 'GET'])
 def process_question():
 	if request.method == 'POST':
-		req_params = request.get_json()
+		req_params: dict = request.get_json()
 		
 		question = req_params.get('question', '')
 		ksim = int(req_params.get('ksim', 1))
