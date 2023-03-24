@@ -1,4 +1,6 @@
 import configparser
+import copy
+
 from flask import Flask, render_template, request, jsonify
 from app_helper import ModelController
 import csv
@@ -10,9 +12,11 @@ controller = ModelController(app.config['DISABLE_EMBEDDINGS'], app.config['DISAB
 
 conversation = []
 
+
 @app.route('/')
 def index():
 	return render_template('index.html', model_name=app.config['GPT_MODEL'])
+
 
 @app.route('/process_question', methods=['POST', 'GET'])
 def process_question():
@@ -37,7 +41,10 @@ def upload_convo():
 	Overwrites the conversation global list with the CSVs contents, if successful.
 	Returns a JSON object containing a message type, a message, and a boolean indicating success/failure.
 	'''
+	global conversation
 	req_params = request.get_json()
+
+	old_convo = copy.deepcopy(conversation)
 	conversation.clear()
 
 	mesg_type = ''
@@ -61,8 +68,10 @@ def upload_convo():
 		mesg_type = 'error'
 		message = 'File should be a CSV with no header, with every row following format: "query,response"'
 		ok = False
+		conversation = old_convo
 	
-	print(conversation)
+	# print(conversation)
+
 	return jsonify({
 		'type': mesg_type,
 		'message': message,
