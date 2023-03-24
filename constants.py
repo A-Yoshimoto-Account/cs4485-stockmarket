@@ -1,4 +1,4 @@
-OPENAI_ENV_VAR = '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'
+OPENAI_ENV_VAR = 'OPENAI_API_KEY'
 
 ALIAS = 'default'
 HOST = 'localhost'
