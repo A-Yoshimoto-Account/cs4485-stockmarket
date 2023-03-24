@@ -12,6 +12,7 @@ conversation = []
 def index():
 	return render_template('index.html', model_name=app.config['GPT_MODEL'])
 
+#Part of Submit function
 @app.route('/process_question', methods=['POST', 'GET'])
 def process_question():
 	if request.method == 'POST':
@@ -33,8 +34,15 @@ def get_model_response(
 		memory=0,
 		refine=None,
 	):
-	prev_questions = conversation[:-memory]
+	prev_questions = conversation[-memory:]
 	return controller.ask_question(app.config['ENDPOINT'], app.config['GPT_MODEL'], question, ksim=ksim, memory=prev_questions, refine=refine)
+
+#Clear Conversation Memory Function
+@app.route('/clear_memory', methods=['POST', 'GET'])
+def clear_memory():
+	if request.method == 'POST':
+		conversation.clear()
+		return "Completed Task"
 
 if __name__ == '__main__':
 	app.run(debug=True)
