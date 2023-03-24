@@ -30,12 +30,12 @@ class OpenAIPromptCreator:
                 'content': interaction['question']
             })
         messages.append({
-            'role': 'assistant',
-            'content': context
-        })
-        messages.append({
             'role': 'user',
             'content': question
+        })
+        messages.append({
+            'role': 'assistant',
+            'content': context
         })
         return messages
 
