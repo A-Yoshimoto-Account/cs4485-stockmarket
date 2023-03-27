@@ -45,31 +45,30 @@ def upload_convo():
 	global conversation
 	req_params = request.get_json()
 
-	old_convo = copy.deepcopy(conversation)
-	conversation.clear()
-
 	mesg_type = ''
 	message = ''
 	ok = True
+	content = []
 	
 	buffer = StringIO(req_params)
 	try:
-		reader = csv.reader(buffer, delimiter=',')	
+		reader = csv.reader(buffer, quotechar='"', escapechar='\\', delimiter=',')
 		for row in reader:
 			if (len(row) != 2):
 				raise Exception
-			conversation.append({
+			content.append({
 				'question': row[0],
 				'answer': row[1]
 			})
 		mesg_type = 'notification'
 		message = 'Conversation memory overwritten with uploaded file'
 		ok = True
+		conversation = copy.deepcopy(content)
 	except:
 		mesg_type = 'error'
 		message = 'File should be a CSV with no header, with every row following format: "query,response"'
 		ok = False
-		conversation = old_convo
+		content = []
 	
 	# print(conversation)
 
@@ -77,6 +76,7 @@ def upload_convo():
 		'type': mesg_type,
 		'message': message,
 		'ok': ok,
+		'content': content
 	})
 
 

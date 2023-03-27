@@ -136,7 +136,7 @@ function uploadSavedConvo() {
 	let csvReader = new FileReader();
 	csvReader.onload = function() {
 		// retrieve text of file
-		const fileText = csvReader.result.replace(/\"/g, '"');
+		const fileText = csvReader.result;
 		console.log(fileText);
 		const url = '/upload_convo';
 		fetch(
@@ -152,10 +152,9 @@ function uploadSavedConvo() {
 			// on success, populate text area with file's contents
 			if (resp['ok']) {
 				chatArea.innerHTML = '';
-				rows = fileText.split('\n');
+				rows = resp['content']
 				rows.forEach((row) => {
-					content = row.split(',');
-					chatArea.innerHTML += createConvoElement(content[0], content[1]);	
+					chatArea.innerHTML += createConvoElement(row['question'], row['answer']);	
 				})
 			}
 			// append the system message
