@@ -15,9 +15,10 @@ COMLPETION_MODELS = ['text-davinci-003', 'text-curie-001']
 
 
 class OpenAIController:
-    def __init__(self, api_key: str, disable: bool = False, **kwargs):
+    def __init__(self, api_key: str, disable_embeds: bool = False, disable_completions: bool = False, **kwargs):
         openai.api_key = api_key
-        self.disable = disable
+        self.disable_embeds = disable_embeds
+        self.disable_completions = disable_completions
         self.prompter = OpenAIPromptCreator(**kwargs)
 
     def access_model(
@@ -47,8 +48,8 @@ class OpenAIController:
             model: str,
             text: str
     ) -> list[int]:
-        if self.disable:
-            return [0] * EMBEDDING_LENGTH
+        if self.disable_embeds:
+            return [[0] * EMBEDDING_LENGTH]
         resp = openai.Embedding.create(
             model=model,
             input=text,
@@ -61,7 +62,7 @@ class OpenAIController:
             question: str,
             context: str,
     ) -> str:
-        if self.disable:
+        if self.disable_completions:
             return OpenAIController._placeholder_response(question)
 
         prompt = self.prompter.create_completion_prompt(question, context)
@@ -78,7 +79,7 @@ class OpenAIController:
             context: str,
             memory: list[dict[str, str]],
     ) -> str:
-        if self.disable:
+        if self.disable_completions:
             return OpenAIController._placeholder_response(question)
         messages = self.prompter.create_chat_messages(question, context, memory)
         resp = openai.ChatCompletion.create(

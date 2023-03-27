@@ -21,7 +21,6 @@
 	width: 75vw;
 	height: 50vh;
 	font-size: 12pt;
-	overflow: auto;
 }
 .query-text {
 	width: 50vw;
@@ -35,12 +34,16 @@
 }
 .text-block p {
 	margin: 0px;
-	word-break: break-all;
-	display: inline-block;
+	display: inline;
+	overflow-wrap: anywhere;
+	hyphens: manual;
 }
 .user-queries {
 	background-color: lightcyan;
 }
 .model-responses {
 	background-color: lightblue;
+}
+.system-messages {
+	background-color: darkorange;
 }

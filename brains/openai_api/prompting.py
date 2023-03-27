@@ -18,7 +18,7 @@ class OpenAIPromptCreator:
     ) ->  list[dict]:
         messages = [{
             'role': 'system',
-            'content': self.system
+            'content': f'{self.system}'
         }]
         for interaction in memory:
             messages.append({
@@ -30,12 +30,12 @@ class OpenAIPromptCreator:
                 'content': interaction['question']
             })
         messages.append({
-            'role': 'assistant',
-            'content': context
-        })
-        messages.append({
             'role': 'user',
             'content': question
+        })
+        messages.append({
+            'role': 'assistant',
+            'content': context
         })
         return messages
 
