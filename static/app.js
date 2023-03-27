@@ -46,14 +46,20 @@ function updateTextArea() {
 			chatArea.scrollTop = chatArea.scrollHeight;
 		})
 }
-
+/**
+ * creates a CSV file of the text area conversation and download it to the user's browser
+ */
 function downloadConvo() {
 	let type = {type: 'text/csv;charset=utf-8'};
+	// get CSV string
 	let data = getConversation();
+	// create CSV file
 	let file = new Blob([data], type=type);
 	let modelName = document.getElementById('modelName').innerHTML;
 	let now = getDateTimeNow();
+	// make file name
 	let filename = modelName + '_' + now + '.csv'
+	// create URL to click to download
 	let url = URL.createObjectURL(file);
 
 	let downloadLink = document.createElement('a');
@@ -62,19 +68,23 @@ function downloadConvo() {
 	downloadLink.download = filename;
 
 	document.body.appendChild(downloadLink);
+	// click link to download
 	downloadLink.click();
 	document.body.removeChild(downloadLink);
-
 }
+/**
+ * @returns the text area conversation as a CSV string
+ */
 function getConversation() {
 	queryDivs = document.getElementsByClassName("user-queries")
 	responseDivs = document.getElementsByClassName("model-responses");
 	rows = '';
+	// iterate through each query and response div in the text area
 	Array.from(queryDivs).forEach((queryDiv, index) => {
 		responseDiv = responseDivs[index];
-		query = queryDiv.getElementsByTagName('p')[0].innerHTML;
-		response = responseDiv.getElementsByTagName('p')[0].innerHTML;
-		rows += query + ',' + response;
+		query = formatCSVString(queryDiv.getElementsByTagName('p')[0].innerHTML);
+		response = formatCSVString(responseDiv.getElementsByTagName('p')[0].innerHTML);
+		rows += `${query},${response}`
 		if (index < queryDivs.length - 1) {
 			rows += '\n';
 		}
@@ -82,6 +92,9 @@ function getConversation() {
 
 	return rows;
 }
+/**
+ * @returns The current time as a string
+ */
 function getDateTimeNow() {
 	let d = new Date(Date.now());
 	year = d.getFullYear();
@@ -92,6 +105,13 @@ function getDateTimeNow() {
 	seconds = d.getSeconds();
 
 	return year + '-' + month + '-' + day + '_' + hour + ':' + minute + ':' + seconds;
+}
+/**
+ * Formats the input string to replace any quotations with \" and surround with double quotes
+ * @param {String} s String to format
+ */
+function formatCSVString(s) {
+	return `"${s.replace(/"/g, '\\"')}"`;
 }
 
 /**
