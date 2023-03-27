@@ -136,7 +136,8 @@ function uploadSavedConvo() {
 	let csvReader = new FileReader();
 	csvReader.onload = function() {
 		// retrieve text of file
-		const fileText = csvReader.result
+		const fileText = csvReader.result.replace(/\"/g, '"');
+		console.log(fileText);
 		const url = '/upload_convo';
 		fetch(
 			url, 
