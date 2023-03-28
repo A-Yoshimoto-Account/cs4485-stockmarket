@@ -7,11 +7,14 @@ from pymilvus import connections, Collection, CollectionSchema, FieldSchema
 import configparser
 import schemas
 import pandas as pd
+from datetime import datetime
+import os
+from brains.data_set_gathering.gather_news import NewsApiController
 
 config_file = 'db-connection.ini'
 dbconn_configs = configparser.ConfigParser()
 dbconn_configs.read(config_file)
-
+news_api_controller = NewsApiController(os.getenv("NEWS_API_KEY"))
 
 def connect_to_db():
     connections.connect(
@@ -87,11 +90,19 @@ def populate_table(table_name: str, text_df: pd.DataFrame, embed_df: pd.DataFram
     print(resp)
     print()
 
+def create_file_path(
+    type: str
+):
+    today = datetime.today().strftime('%m-%d-%Y')
+    directory = 'initial_data/'
+    file_name = f'{type}_{today}.csv'
+    return os.path.join(directory, file_name)  
 
 def main():
     connect_to_db()
     create_tables()
-    text_df = pd.read_csv('initial_data/test_contexts.csv')
+    news_api_controller.create_context_csv()
+    text_df = pd.read_csv(create_file_path('context'))
     embed_df = pd.read_csv('initial_data/test_embeds.csv')
     populate_table('context_embeddings', text_df, embed_df)
     disconnect_from_db()
