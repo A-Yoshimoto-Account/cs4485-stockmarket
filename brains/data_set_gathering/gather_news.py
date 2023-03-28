@@ -1,67 +1,63 @@
 import os
 from dotenv import load_dotenv
-
-import openpyxl
-import pandas as pd
+import csv
 import requests
 from goose3 import Goose
-
+from datetime import datetime
 from newsapi import NewsApiClient
-
 # Load API Keys from .env file
 load_dotenv()
 
 # Set News API Key
-newsapi = NewsApiClient(api_key=os.getenv("NEWS_API_KEY"))
+api = NewsApiClient(api_key=os.getenv("NEWS_API_KEY"))
 
 '''
-Fetches articles about the given company and saves them in the given filename as a Microsoft Excel file
+Fetches articles about the given company and saves them in the given filename as a csv file
 '''
-def create_company_articles_workbook(q='Nvidia market', filename='sample_fine_tune.xlsx', domains=None, excludeDomains=None):
-	# Create Python Goose Article Extractor Object
-	g = Goose()
 
-	# Create a workbook object
-	workbook = openpyxl.Workbook()
+# White and backlist as specified in the Google Docs Drive
+whitelist = 'marketwatch.com, fool.com, barrons.com, economist.com, bloomberg.com'
+blacklist = 'kotaku.com, gizmodo.com, digitaltrends.com, stocknews.com'
+news_api_query = 'Nvidia market'
 
-	# Select the active sheet
-	sheet = workbook.active
+
+def create_context_csv():
+	# Current date for file name
+	today = datetime.today().strftime('%m-%d-%Y')
+
+	# Create file path directory to Milvus DB
+	directory = 'milvus_db\initial_data'
+
+	# create file name
+	file_name = f'context_{today}.csv'
+
+	# create full file path
+	file_path = os.path.join(directory, file_name)
 	
-	# Perform call for get_everything endpoint of News API
+	contents =  create_content_list()
+	
+	with open(file_path, 'w', newline='') as file:
+		writer = csv.writer(file)
+		for content in contents:
+				writer.writerow([content])
+
+def create_content_list(q=news_api_query, domains=whitelist, excludeDomains=blacklist) :
+# Create empty list to store article content
+	content = []
+# Perform call for get_everything endpoint of News API
 	news_articles = newsapi.get_everything(q=q, language='en', domains=domains, exclude_domains=excludeDomains) # News Article is a nested dictionary
-
-	# These column titles are necessary for putting the xlsx in a format recognizable by the OpenAI CLI data preparation tool
-	sheet["A1"] = "title"
-	sheet["B1"] = "date_published"
-	sheet["C1"] = "url"
-	sheet["D1"] = "timeout"
-	sheet["E1"] = "content"
-	
-
-	row = 2 # began at the next row
-
-	# extract the article text from each news article, if URL request timesout write information to xlsx
+# Create Python Goose Article Extractor Object
+	g = Goose()
+# extract the article text from each news article
 	for news in news_articles.get('articles'):
 		try :
 			title = news.get('title')
 			date = news.get('publishedAt')
 			url = news.get('url')
 			content = g.extract(url=url).cleaned_text
-			timeout = False
 		except requests.exceptions.ReadTimeout:
-			title = news.get('title')
-			date = news.get('publishedAt')
-			url = news.get('url')
-			content = news.get('content')
-			timeout = True
+			print('News API Read Timeout')
 		finally:
-			print(url)
-			sheet.cell(row=row, column=1, value = title);
-			sheet.cell(row=row, column=2, value = date);
-			sheet.cell(row=row, column=3, value = url);
-			sheet.cell(row=row, column=4, value = timeout);
-			sheet.cell(row=row, column=5, value = content);
-			
-			row += 1
-
-	workbook.save(filename)
+			row_data = f'{title}\n{date}\n{content}'
+			content.append(row_data)
+	return content
