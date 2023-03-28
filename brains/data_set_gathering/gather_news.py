@@ -45,7 +45,7 @@ def create_content_list(q=news_api_query, domains=whitelist, excludeDomains=blac
 # Create empty list to store article content
 	content = []
 # Perform call for get_everything endpoint of News API
-	news_articles = newsapi.get_everything(q=q, language='en', domains=domains, exclude_domains=excludeDomains) # News Article is a nested dictionary
+	news_articles = api.get_everything(q=q, language='en', domains=domains, exclude_domains=excludeDomains) # News Article is a nested dictionary
 # Create Python Goose Article Extractor Object
 	g = Goose()
 # extract the article text from each news article
