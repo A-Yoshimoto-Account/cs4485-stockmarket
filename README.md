@@ -30,3 +30,5 @@ The Flask app is a single file module. The packages in this project include code
 - accesses articles from the web with News API and web scraping
 - uses a Docker container of the Milvus vector database to store and access text and text embeddings
 - uses the OpenAI Python API to access GPT models
+
+Please have environment variables or a .env for OPENAI_API_KEY and NEWS_API_KEY

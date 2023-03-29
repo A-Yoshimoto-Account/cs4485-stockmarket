@@ -9,12 +9,10 @@ import schemas
 import pandas as pd
 from datetime import datetime
 import os
-from brains.data_set_gathering.gather_news import NewsApiController
 
 config_file = 'db-connection.ini'
 dbconn_configs = configparser.ConfigParser()
 dbconn_configs.read(config_file)
-news_api_controller = NewsApiController(os.getenv("NEWS_API_KEY"))
 
 def connect_to_db():
     connections.connect(
@@ -60,7 +58,9 @@ def create_tables():
             using=using,
             shards_num=shards_num,
         )
-
+        # Releasing the collection (if it exists) before creating a new one
+        # this would resolve an error attempting to load an updated database to Milvus
+        collection.release()
         if table['index']:
             index = table['index']
             index_field = index['field_name']
@@ -101,7 +101,6 @@ def create_file_path(
 def main():
     connect_to_db()
     create_tables()
-    news_api_controller.create_context_csv()
     text_df = pd.read_csv(create_file_path('context'))
     embed_df = pd.read_csv('initial_data/test_embeds.csv')
     populate_table('context_embeddings', text_df, embed_df)
