@@ -4,6 +4,7 @@ import requests
 from goose3 import Goose
 from datetime import datetime
 from newsapi import NewsApiClient
+from dataset_cleaner import clean_csv
 
 '''
 Fetches articles about the given company and saves them in the given filename as a csv file
@@ -21,16 +22,26 @@ def create_context_csv():
     directory = 'milvus_db\initial_data'
     file_name = f'context_{today}.csv'
     file_path = os.path.join(directory, file_name)
-    contents =  create_content_list()
-    print('Writing to file..')
-    with open(file_path, 'w', newline='', encoding='utf-8') as file:
-        writer = csv.writer(file)
-        for content in contents:
-            writer.writerow([content])
-            
+    
+    if not os.path.exists(file_path):
+        col_headers = ['URL','Title','Date','Content']
+        contents =  create_content_list()
+        print('Writing to file..')
+        with open(file_path, 'w', newline='', encoding='utf-8') as file:
+            writer = csv.writer(file)
+            writer.writerow(col_headers)
+            writer.writerows(contents)
+            # for content in contents:
+            #     writer.writerow([content])
+
+        #after file is created, it is cleaned
+        clean_csv(file_path)
+    else:
+        print("This file already exists.")
+
 def create_content_list(q=NEWS_API_QUERY, domains=WHITELIST, excludeDomains=BLACKLIST) :
     content_list = []
-    content_list.append('context')
+    # content_list.append('context')
     news_articles = api.get_everything(q=q, language='en', domains=domains, exclude_domains=excludeDomains, sort_by='relevancy') # News Article is a nested dictionary
     g = Goose()
     print('Getting article contents..')
@@ -38,12 +49,19 @@ def create_content_list(q=NEWS_API_QUERY, domains=WHITELIST, excludeDomains=BLAC
         try :
             title = news.get('title')
             date = news.get('publishedAt')
+            splitdate = date.split('T')
+            ymd = splitdate[0] # ymd = year month day
             url = news.get('url')
             content = g.extract(url=url).cleaned_text
         except requests.exceptions.ReadTimeout:
             print('News API Read Timeout')
         finally:
-            row_data = f'{title}\n{date}\n{content}'
+            # row_data = f'{title}\n{date}\n{content}'
+            row_data = []
+            row_data.append(url)
+            row_data.append(title)
+            row_data.append(ymd)
+            row_data.append(content)
             content_list.append(row_data)
     return content_list
 
