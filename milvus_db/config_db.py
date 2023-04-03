@@ -7,11 +7,12 @@ from pymilvus import connections, Collection, CollectionSchema, FieldSchema
 import configparser
 import schemas
 import pandas as pd
+from datetime import datetime
+import os
 
 config_file = 'db-connection.ini'
 dbconn_configs = configparser.ConfigParser()
 dbconn_configs.read(config_file)
-
 
 def connect_to_db():
     connections.connect(
@@ -57,7 +58,9 @@ def create_tables():
             using=using,
             shards_num=shards_num,
         )
-
+        # Releasing the collection (if it exists) before creating a new one
+        # this would resolve an error attempting to load an updated database to Milvus
+        collection.release()
         if table['index']:
             index = table['index']
             index_field = index['field_name']
@@ -87,11 +90,18 @@ def populate_table(table_name: str, text_df: pd.DataFrame, embed_df: pd.DataFram
     print(resp)
     print()
 
+def create_file_path(
+    type: str
+):
+    today = datetime.today().strftime('%m-%d-%Y')
+    directory = 'initial_data/'
+    file_name = f'{type}_{today}.csv'
+    return os.path.join(directory, file_name)  
 
 def main():
     connect_to_db()
     create_tables()
-    text_df = pd.read_csv('initial_data/test_contexts.csv')
+    text_df = pd.read_csv(create_file_path('context'))
     embed_df = pd.read_csv('initial_data/test_embeds.csv')
     populate_table('context_embeddings', text_df, embed_df)
     disconnect_from_db()

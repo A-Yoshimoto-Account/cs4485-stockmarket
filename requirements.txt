@@ -2,7 +2,7 @@ beautifulsoup4==4.11.2
 Flask==2.2.2
 goose3==3.1.12
 newsapi==0.1.1
-newsapi_python==0.2.6
+newsapi_python==0.2.7
 numpy==1.24.1
 openai==0.27.2
 openpyxl==3.1.1
