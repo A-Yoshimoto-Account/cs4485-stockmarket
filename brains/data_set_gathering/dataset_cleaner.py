@@ -78,7 +78,7 @@ def cleaning_Content(df):
 
 #Creates a new col named "Combined" which is what will be fed into embeddings
 def create_combined(df):
-    df["Combined"] = (
+    df["context"] = (
     "Title: " + df.Title.str.strip() + "; Date: " + df.Date.str.strip()
     + "; Content: " + df.Content.str.strip())
     return df
@@ -87,7 +87,7 @@ def create_combined(df):
 def create_token_count(df):
     encoding = tiktoken.get_encoding(EMBEDDING_ENCODING)
 
-    df["n_tokens"] = df.Combined.apply(lambda x: len(encoding.encode(x)))
+    df["n_tokens"] = df.context.apply(lambda x: len(encoding.encode(x)))
     df = df[df.n_tokens <= MAX_TOKENS]
     return df
 
