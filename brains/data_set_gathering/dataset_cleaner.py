@@ -8,12 +8,20 @@ MAX_TOKENS = 8000
 #Main runner of datasetcleaner
 def clean_csv(filepath):
     dataframe = pd.read_csv(filepath)
+    dataframe = checkRelavance(dataframe)
     dataframe = cleaning_Title(dataframe)
     # dataframe = cleaning_Date(dataframe)
     dataframe = cleaning_Content(dataframe)
     dataframe = create_combined(dataframe)
     dataframe = create_token_count(dataframe)
     overwrite(dataframe,filepath)
+
+def checkRelavance(df):
+    df.drop(df[(df['Content'].str.contains('Nvidia') == False) 
+            & (df['Content'].str.contains('NVDA') == False)
+            &(df['Content'].str.contains('nvidia') == False)
+            & (df['Content'].str.contains('nvda') == False)].index, inplace=True)
+    return df
 
 
 #Cleans title of any unwanted or unneeded data
