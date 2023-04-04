@@ -21,7 +21,9 @@ def create_context_csv():
     today = datetime.today().strftime('%m-%d-%Y')
     directory = 'milvus_db\initial_data'
     file_name = f'context_{today}.csv'
+    embed_file_name = f'embeds_{today}.csv'
     file_path = os.path.join(directory, file_name)
+    embed_file_path = os.path.join(directory, embed_file_name)
     
     if not os.path.exists(file_path):
         col_headers = ['URL','Title','Date','Content']
@@ -35,7 +37,7 @@ def create_context_csv():
             #     writer.writerow([content])
 
         #after file is created, it is cleaned
-        clean_csv(file_path)
+        clean_csv(file_path, embed_file_path)
     else:
         print("This file already exists.")
 
