@@ -98,13 +98,13 @@ def create_file_path(
     today = datetime.today().strftime('%m-%d-%Y')
     directory = 'initial_data/'
     file_name = f'{type}_{today}.csv'
-    return os.path.join(directory, file_name)  
+    return os.path.join(directory, file_name)
 
 def main():
     connect_to_db()
     create_tables()
     text_df = pd.read_csv(create_file_path('context'))
-    embed_df = pd.read_csv('initial_data/test_embeds.csv')
+    embed_df = pd.read_csv(create_file_path('embeds'))
     populate_table('context_embeddings', text_df, embed_df)
     disconnect_from_db()
 
