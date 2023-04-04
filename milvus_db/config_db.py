@@ -3,7 +3,7 @@
 # 	by docker compose and the official YAML file: https://github.com/milvus-io/milvus/releases/download/v2.2.3/milvus-standalone-docker-compose.yml
 # instructions can be found here: https://milvus.io/docs/install_standalone-docker.md
 
-from pymilvus import connections, Collection, CollectionSchema, FieldSchema
+from pymilvus import connections, Collection, CollectionSchema, FieldSchema, utility
 import configparser
 import schemas
 import pandas as pd
@@ -32,6 +32,8 @@ def create_tables():
     table_schemas = schemas.TABLE_SCHEMAS
 
     for table_name in table_names:
+        if utility.has_collection(table_name):
+            continue
         table = table_schemas[table_name]
         columns = table['columns']
         col_fields = table['fields']
