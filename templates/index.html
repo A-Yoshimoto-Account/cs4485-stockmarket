@@ -22,10 +22,10 @@
 		<div class="text-area large-container" id="chat-area">
 		</div>
 		<div class="text-field large-container">
-			<form id="send-query-form" onsubmit="this.reset();return false;">
+			<form id="send-query-form" onsubmit="updateTextArea();">
 				<label for="text">Talk with the model</label><br>
 				<input autocomplete="off" class="query-text" type="text" name="question">
-				<input type="submit" value="Submit" onclick="updateTextArea()">
+				<input type="submit" value="Submit" onclick="submitForm(event)">
 			</form>
 		</div>
 		<div class="large-container">

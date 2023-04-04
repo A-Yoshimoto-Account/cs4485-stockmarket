@@ -11,8 +11,28 @@ function updateMemoryValue() {
 Connected to Submit button
 
 */
+
+// Prevent empty submissions
+function submitForm(event) {
+    event.preventDefault();
+    var inputField = document.querySelector(".query-text");
+    if (inputField.value.trim() !== "") {
+        // Submit the form
+        document.getElementById("send-query-form").onsubmit();
+    } else {
+        // Do nothing or show an error message
+    }
+}
 // Submit key function
 function updateTextArea() {
+	// constants for button disabling
+	const form = document.querySelector('#send-query-form');
+	const button = form.querySelector('input[type="submit"]'); 
+
+	// Disable Button
+	button.disabled = true;
+
+	// gather arguments for endpoints
 	let data = {
 		'question': document.querySelector("input[name='question']").value,
 		'ksim': document.getElementById('kSimRange').value,
@@ -59,6 +79,8 @@ function updateTextArea() {
 					let chatArea = document.getElementById('chat-area');
 					chatArea.innerHTML += html;
 					chatArea.scrollTop = chatArea.scrollHeight;
+					// Re-enable button
+					button.disabled = false;
 				})
 		})
 }
