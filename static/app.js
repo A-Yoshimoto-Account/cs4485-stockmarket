@@ -32,6 +32,8 @@ function updateTextArea() {
 	// Disable Button
 	button.disabled = true;
 
+	// show spinner
+	document.getElementById("spinner").style.visibility="visible";
 	// gather arguments for endpoints
 	let data = {
 		'question': document.querySelector("input[name='question']").value,
@@ -81,6 +83,8 @@ function updateTextArea() {
 					chatArea.scrollTop = chatArea.scrollHeight;
 					// Re-enable button
 					button.disabled = false;
+					// hide spinner
+					document.getElementById("spinner").style.visibility="hidden";
 				})
 		})
 }
@@ -245,7 +249,7 @@ function clearAll() {
 				'</div>';
 	chatArea.innerHTML += html;
 	chatArea.scrollTop = chatArea.scrollHeight;
-	setTimeout(function() {document.getElementById('chat-area').innerHTML = '';} , 5000);
+	setTimeout(function() {document.getElementById('chat-area').innerHTML = '';} , 2500);
 }
 /**
  * Takes in a system message type and a system message to
@@ -278,3 +282,8 @@ function createConvoElement(question, answer) {
 			'	</div>' + 
 			'</div>';
 }
+
+// This is the code that runs when the page loads
+window.addEventListener("load", function() {
+	document.getElementById("spinner").style.visibility = "hidden";
+  });

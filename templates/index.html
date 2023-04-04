@@ -19,7 +19,10 @@
 			<p>Conversation memory: <span label="memoryLabel">3</span></p>
 			<input autocomplete="off" type="range" min="1" max="5" value="3" class="slider" id="memoryRange" oninput="updateMemoryValue()">
 		</div>
-		<div class="text-area large-container" id="chat-area">
+		<div class="large-container" id="spinner-container">
+			<img id="spinner" src="static\Spinner-1s-235px.gif">
+			<div class="text-area large-container" id="chat-area">
+			</div>
 		</div>
 		<div class="text-field large-container">
 			<form id="send-query-form" onsubmit="updateTextArea();">
