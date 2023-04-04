@@ -32,8 +32,14 @@ def process_question():
 		
 		conversation.append({'question': question, 'answer': answer})
 		
-		return jsonify({'question': question, 'answer': answer})
+		return jsonify({'answer': answer})
 
+@app.route('/post_user_question', methods=['POST', 'GET'])
+def post_user_question():
+    if request.method == 'POST': 
+        req_params: dict = request.get_json()
+        question = req_params.get('question', '')
+        return jsonify({'question': question})
 
 @app.route('/upload_convo', methods=['POST'])
 def upload_convo():

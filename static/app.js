@@ -22,10 +22,11 @@ function updateTextArea() {
 	console.log(data);
 
 	//Sets endpoint
-	const url = '/process_question';
+	const url1 = 'post_user_question';
+	const url2 = '/process_question';
 	
 	//calls the endpoint
-	fetch(url, {
+	fetch(url1, {
 		'method': 'POST',
 		'headers': {'Content-Type': 'application/json'},
 		'body': JSON.stringify(data)
@@ -36,14 +37,27 @@ function updateTextArea() {
 				'<div class="query-response">' + 
 				'	<div class="user-queries text-block">' + 
 				'		<b>You:&nbsp</b><p>' + data['question'] + '</p>' +
-				'	</div>' + 
-				'	<div class="model-responses text-block">' + 
-				'		<b>Response:&nbsp</b><p>' + data['answer'] + '</p>' + 
-				'	</div>' + 
+				'	</div>' +
 				'</div>';
 			let chatArea = document.getElementById('chat-area');
 			chatArea.innerHTML += html;
 			chatArea.scrollTop = chatArea.scrollHeight;
+			return 	fetch(url2, {
+				'method': 'POST',
+				'headers': {'Content-Type': 'application/json'},
+				'body': JSON.stringify(data)
+			})
+				.then(response => response.json())
+				.then(data => {
+					let html = 
+						'	<div class="model-responses text-block">' + 
+						'		<b>Response:&nbsp</b><p>' + data['answer'] + '</p>' + 
+						'	</div>' + 
+						'</div>';
+					let chatArea = document.getElementById('chat-area');
+					chatArea.innerHTML += html;
+					chatArea.scrollTop = chatArea.scrollHeight;
+				})
 		})
 }
 /**
