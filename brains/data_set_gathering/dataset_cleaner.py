@@ -100,7 +100,7 @@ def overwrite(df,fp):
 
 def get_embeddings(df: pd.DataFrame, filepath: str):
     embed_list = embed_wrapper(df['context'].tolist())
-    pd.DataFrame(embed_list).to_csv(filepath, index=False, header=False)
+    pd.DataFrame(embed_list).to_csv(filepath, index=False)
     
 
 @openai_error_handler
