@@ -25,7 +25,8 @@ function updateTextArea() {
 	const url1 = 'post_user_question';
 	const url2 = '/process_question';
 	
-	//calls the endpoint
+	//calls the endpoints
+	// first endpoint returns the question
 	fetch(url1, {
 		'method': 'POST',
 		'headers': {'Content-Type': 'application/json'},
@@ -42,6 +43,7 @@ function updateTextArea() {
 			let chatArea = document.getElementById('chat-area');
 			chatArea.innerHTML += html;
 			chatArea.scrollTop = chatArea.scrollHeight;
+			// then the second endpoint returns the answer
 			return 	fetch(url2, {
 				'method': 'POST',
 				'headers': {'Content-Type': 'application/json'},

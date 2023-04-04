@@ -19,6 +19,15 @@ def index():
 
 
 #Part of Submit function
+# First endpoint to be called when user submits a question
+@app.route('/post_user_question', methods=['POST', 'GET'])
+def post_user_question():
+    if request.method == 'POST': 
+        req_params: dict = request.get_json()
+        question = req_params.get('question', '')
+        return jsonify({'question': question})
+    
+# Second endpoint to be called after user question posts to UI
 @app.route('/process_question', methods=['POST', 'GET'])
 def process_question():
 	if request.method == 'POST':
@@ -34,12 +43,6 @@ def process_question():
 		
 		return jsonify({'answer': answer})
 
-@app.route('/post_user_question', methods=['POST', 'GET'])
-def post_user_question():
-    if request.method == 'POST': 
-        req_params: dict = request.get_json()
-        question = req_params.get('question', '')
-        return jsonify({'question': question})
 
 @app.route('/upload_convo', methods=['POST'])
 def upload_convo():
