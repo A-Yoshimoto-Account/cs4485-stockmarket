@@ -54,7 +54,7 @@ def openai_error_handler(
                 print(f'Sleeping for {delay} seconds')
                 time.sleep(delay)
                 delay *= expo_base
-                print(f'Next error wait time is {delay} seconds. {rle_max_retries - rle_retries} server error retries remaining')
+                print(f'Next error wait time is {delay} seconds. {servererr_max_retries - servererr_retries} server error retries remaining')
             except Exception as e:
                 raise e
     return wrapper
