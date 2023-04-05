@@ -35,13 +35,16 @@ function updateTextArea() {
 	// show spinner
 	document.getElementById("spinner").style.visibility="visible";
 	// gather arguments for endpoints
-	let data = {
+	let data1 = {
+		'question': document.querySelector("input[name='question']").value,
+	};
+	let data2 = {
 		'question': document.querySelector("input[name='question']").value,
 		'ksim': document.getElementById('kSimRange').value,
 		'memory': document.getElementById('memoryRange').value,
 	};
 	document.querySelector("input[name='question']").value = '';
-	console.log(data);
+	console.log(data2);
 
 	//Sets endpoint
 	const url1 = 'post_user_question';
@@ -52,7 +55,7 @@ function updateTextArea() {
 	fetch(url1, {
 		'method': 'POST',
 		'headers': {'Content-Type': 'application/json'},
-		'body': JSON.stringify(data)
+		'body': JSON.stringify(data1)
 	})
 		.then(response => response.json())
 		.then(data => {
@@ -69,7 +72,7 @@ function updateTextArea() {
 			return 	fetch(url2, {
 				'method': 'POST',
 				'headers': {'Content-Type': 'application/json'},
-				'body': JSON.stringify(data)
+				'body': JSON.stringify(data2)
 			})
 				.then(response => response.json())
 				.then(data => {
