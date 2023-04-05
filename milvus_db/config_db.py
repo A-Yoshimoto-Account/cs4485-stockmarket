@@ -3,7 +3,7 @@
 # 	by docker compose and the official YAML file: https://github.com/milvus-io/milvus/releases/download/v2.2.3/milvus-standalone-docker-compose.yml
 # instructions can be found here: https://milvus.io/docs/install_standalone-docker.md
 
-from pymilvus import connections, Collection, CollectionSchema, FieldSchema
+from pymilvus import connections, Collection, CollectionSchema, FieldSchema, utility
 import configparser
 import schemas
 import pandas as pd
@@ -32,6 +32,8 @@ def create_tables():
     table_schemas = schemas.TABLE_SCHEMAS
 
     for table_name in table_names:
+        if utility.has_collection(table_name):
+            continue
         table = table_schemas[table_name]
         columns = table['columns']
         col_fields = table['fields']
@@ -96,13 +98,13 @@ def create_file_path(
     today = datetime.today().strftime('%m-%d-%Y')
     directory = 'initial_data/'
     file_name = f'{type}_{today}.csv'
-    return os.path.join(directory, file_name)  
+    return os.path.join(directory, file_name)
 
 def main():
     connect_to_db()
     create_tables()
     text_df = pd.read_csv(create_file_path('context'))
-    embed_df = pd.read_csv('initial_data/test_embeds.csv')
+    embed_df = pd.read_csv(create_file_path('embeds'))
     populate_table('context_embeddings', text_df, embed_df)
     disconnect_from_db()
 
