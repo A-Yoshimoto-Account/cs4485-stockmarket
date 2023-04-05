@@ -1,12 +1,14 @@
 import pandas as pd
 import tiktoken
+import openai
+from brains.openai_api.openai_controller import openai_error_handler
 
 EMBEDDING_ENCODING = "cl100k_base"
 MAX_TOKENS = 8000
 
 
 #Main runner of datasetcleaner
-def clean_csv(filepath):
+def clean_csv(filepath, embed_filepath):
     dataframe = pd.read_csv(filepath)
     dataframe = checkRelavance(dataframe)
     dataframe = cleaning_Title(dataframe)
@@ -15,6 +17,7 @@ def clean_csv(filepath):
     dataframe = create_combined(dataframe)
     dataframe = create_token_count(dataframe)
     overwrite(dataframe,filepath)
+    get_embeddings(dataframe, embed_filepath)
 
 def checkRelavance(df):
     df.drop(df[(df['Content'].str.contains('Nvidia') == False) 
@@ -94,3 +97,16 @@ def create_token_count(df):
 #Overwrites original dataset
 def overwrite(df,fp):
     df.to_csv(fp)
+
+def get_embeddings(df: pd.DataFrame, filepath: str):
+    embed_list = embed_wrapper(df['context'].tolist())
+    pd.DataFrame(embed_list).to_csv(filepath, index=False)
+    
+
+@openai_error_handler
+def embed_wrapper(text_list: list):
+    resp = openai.Embedding.create(
+        model='text-embedding-ada-002',
+        input=text_list
+    )
+    return [data['embedding'] for data in resp['data']]
