@@ -1,5 +1,6 @@
 import openai
 import time
+from typing import Union
 from brains.openai_api.prompting import OpenAIPromptCreator
 
 # edit to make it access OpenAI once, instead of multiple times
@@ -92,7 +93,7 @@ class OpenAIController:
     def _embedding(
             self,
             model: str,
-            text: str | list,
+            text: Union[str , list],
     ) -> list[int]:
         if self.disable_embeds:
             return [[0] * EMBEDDING_LENGTH]
