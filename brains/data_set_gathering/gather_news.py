@@ -11,9 +11,9 @@ Fetches articles about the given company and saves them in the given filename as
 '''
 
 # White and backlist as specified in the Google Docs Drive
-WHITELIST = 'marketwatch.com, fool.com, barrons.com, economist.com, bloomberg.com'
-BLACKLIST = 'kotaku.com, gizmodo.com, digitaltrends.com, stocknews.com'
-NEWS_API_QUERY = 'Nvidia market'
+WHITELIST = 'marketwatch.com, fool.com, , economist.com, bloomberg.com'
+BLACKLIST = 'kotaku.com, gizmodo.com, digitaltrends.com, stocknews.com, barrons.com'
+NEWS_API_QUERY = ['Nvidia market', 'AMD market', 'Intel Market', 'ARM Holdings', 'TSMC Market', 'Semiconductor Market', 'Qualcomm'] 
 
 api = NewsApiClient(api_key=os.getenv("NEWS_API_KEY"))
     
@@ -33,38 +33,42 @@ def create_context_csv():
             writer = csv.writer(file)
             writer.writerow(col_headers)
             writer.writerows(contents)
-            # for content in contents:
-            #     writer.writerow([content])
 
         #after file is created, it is cleaned
         clean_csv(file_path, embed_file_path)
     else:
         print("This file already exists.")
 
-def create_content_list(q=NEWS_API_QUERY, domains=WHITELIST, excludeDomains=BLACKLIST) :
+def create_content_list(queries=NEWS_API_QUERY, domains=WHITELIST, excludeDomains=BLACKLIST) :
     content_list = []
-    # content_list.append('context')
-    news_articles = api.get_everything(q=q, language='en', domains=domains, exclude_domains=excludeDomains, sort_by='relevancy') # News Article is a nested dictionary
+    news_articles_list = []
+    for news_query in queries:
+        news_articles_list.append(api.get_everything(q=news_query, language='en', domains=domains, exclude_domains=excludeDomains, sort_by='relevancy')) # News Article is a nested dictionary
     g = Goose()
-    print('Getting article contents..')
-    for news in news_articles.get('articles'):
-        try :
-            title = news.get('title')
-            date = news.get('publishedAt')
-            splitdate = date.split('T')
-            ymd = splitdate[0] # ymd = year month day
-            url = news.get('url')
-            content = g.extract(url=url).cleaned_text
-        except requests.exceptions.ReadTimeout:
-            print('News API Read Timeout')
-        finally:
-            # row_data = f'{title}\n{date}\n{content}'
-            row_data = []
-            row_data.append(url)
-            row_data.append(title)
-            row_data.append(ymd)
-            row_data.append(content)
-            content_list.append(row_data)
+    count = 0
+    for news_articles in news_articles_list:
+        print(f"Getting article contents for '{queries[count]}'...")
+        count += 1
+        progress = 1
+        for news in news_articles.get('articles'):
+            try :
+                title = news.get('title')
+                date = news.get('publishedAt')
+                splitdate = date.split('T')
+                ymd = splitdate[0] # ymd = year month day
+                url = news.get('url')
+                content = g.extract(url).cleaned_text
+            except requests.exceptions.ReadTimeout:
+                print('News API Read Timeout')
+            finally:
+                row_data = []
+                row_data.append(url)
+                row_data.append(title)
+                row_data.append(ymd)
+                row_data.append(content)
+                content_list.append(row_data)
+                print(f"Progress: [{progress}/{len(news_articles.get('articles'))}]", end="\r")
+                progress += 1
     return content_list
 
 def main() :
