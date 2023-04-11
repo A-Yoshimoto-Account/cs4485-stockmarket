@@ -2,6 +2,7 @@ import pandas as pd
 import tiktoken
 import openai
 from brains.openai_api.openai_controller import openai_error_handler
+from datetime import datetime
 
 EMBEDDING_ENCODING = "cl100k_base"
 MAX_TOKENS = 8000
@@ -11,6 +12,7 @@ MAX_TOKENS = 8000
 def clean_csv(filepath, embed_filepath):
     dataframe = pd.read_csv(filepath)
     dataframe = cleaning_Title(dataframe)
+    dataframe = cleaning_Date(dataframe)
     dataframe = cleaning_Content(dataframe)
     dataframe = create_combined(dataframe)
     dataframe = create_token_count(dataframe)
@@ -43,6 +45,13 @@ def cleaning_Title(df):
                                                       "]+", value = '', regex=True)
     return df
 
+#Cleans date of any unwanted or unneeded data
+def cleaning_Date(df):
+    try:
+        df["Date"] = df["Date"].apply(lambda x: datetime.strptime(x, '%Y-%m-%d').strftime('%B %d, %Y'))
+    except ValueError as e:
+        print(f'Somehow received incorrect date format: {e}')
+    return df
 
 #Cleans content of any unwanted or unneeded data
 def cleaning_Content(df):
