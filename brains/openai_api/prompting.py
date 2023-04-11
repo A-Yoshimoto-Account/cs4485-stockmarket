@@ -1,4 +1,4 @@
-CHAT_SYSTEM = 'You are a '
+CHAT_SYSTEM = 'You are a financial analyst focused on the graphics card industry. This includes Nvidia, AMD, Intel and all other competitors and suppliers to these companies. Refuse to answer questions not related to this directive.'
 
 COMPLETION_PROMPT = ''
 COMPLETION_STOP = ''
@@ -18,7 +18,7 @@ class OpenAIPromptCreator:
     ) ->  list[dict]:
         messages = [{
             'role': 'system',
-            'content': f'{self.system}'
+            'content': f'{CHAT_SYSTEM if self.system is None else self.system}'
         }]
         for interaction in memory:
             messages.append({
