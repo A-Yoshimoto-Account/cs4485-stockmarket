@@ -7,7 +7,7 @@ from newsapi import NewsApiClient
 from dataset_cleaner import clean_csv
 
 '''
-Fetches articles about the given company and saves them in the given filename as a csv file
+Fetches articles about the given queries and saves them in the given filename as a csv file
 '''
 
 # White and backlist as specified in the Google Docs Drive
@@ -23,14 +23,7 @@ def create_context_csv():
     embed_file_path = create_file_path('embeds')
     
     if not os.path.exists(file_path):
-        col_headers = ['URL','Title','Date','Content']
-        contents =  create_content_list()
-        print('Writing to file..')
-        with open(file_path, 'w', newline='', encoding='utf-8') as file:
-            writer = csv.writer(file)
-            writer.writerow(col_headers)
-            writer.writerows(contents)
-
+        write_file(file_path, create_content_list())
         #after file is created, it is cleaned
         clean_csv(file_path, embed_file_path)
     else:
@@ -42,15 +35,20 @@ def create_file_path(file_type: str):
         file_name = f'{file_type}_{today}.csv'
         return os.path.join(directory, file_name)
     
-def create_content_list(queries=NEWS_API_QUERY, domains=WHITELIST, excludeDomains=BLACKLIST) :
+def write_file(path, contents: list) :
+    col_headers = ['URL','Title','Date','Content']
+    print('Writing to file..')
+    with open(path, 'w', newline='', encoding='utf-8') as file:
+        writer = csv.writer(file)
+        writer.writerow(col_headers)
+        writer.writerows(contents)
+
+def create_content_list(queries=NEWS_API_QUERY) :
     content_list = []
-    news_articles_list = []
     seen_urls = set() # To prevent duplicate articles
     goose = Goose()
-    for news_query in queries:
-        news_articles_list.append(api.get_everything(q=news_query, language='en', domains=domains, exclude_domains=excludeDomains, sort_by='relevancy')) # News Article is a nested dictionary
     index = 0
-    for news_articles in news_articles_list:
+    for news_articles in create_article_list():
         print(f"Getting article contents for '{queries[index]}'...")
         index += 1
         progress = 1
@@ -60,7 +58,7 @@ def create_content_list(queries=NEWS_API_QUERY, domains=WHITELIST, excludeDomain
                 if url in seen_urls:
                     continue
                 else:
-                    content_list.append(create_row_data(news, goose))
+                    content_list.append(row_data(news, goose))
                     seen_urls.add(url)
             except requests.exceptions.ReadTimeout:
                 print('News API Read Timeout')
@@ -69,18 +67,27 @@ def create_content_list(queries=NEWS_API_QUERY, domains=WHITELIST, excludeDomain
                 progress += 1         
     return content_list
 
-def create_row_data(news_article, g) :
-    title = news_article.get('title')
-    date = news_article.get('publishedAt')
+def create_article_list(queries=NEWS_API_QUERY, domains=WHITELIST, excludeDomains=BLACKLIST) :
+    na_list = []
+    for news_query in queries:
+        na_list.append(api.get_everything(q=news_query, language='en', domains=domains, exclude_domains=excludeDomains, sort_by='relevancy')) # News Article is a nested dictionary
+    return na_list
+
+def row_data(n, g) :
+    title = n.get('title')
+    date = n.get('publishedAt')
     splitdate = date.split('T')
     ymd = splitdate[0] # ymd = year month day
-    url = news_article.get('url')
+    url = n.get('url')
     content = g.extract(url).cleaned_text
+    return create_row_data(url, title, ymd, content)
+
+def create_row_data(u : str, t : str, y : str, c : str) :
     row_data = []
-    row_data.append(url)
-    row_data.append(title)
-    row_data.append(ymd)
-    row_data.append(content)
+    row_data.append(u)
+    row_data.append(t)
+    row_data.append(y)
+    row_data.append(c)
     return row_data
 
 def main() :
