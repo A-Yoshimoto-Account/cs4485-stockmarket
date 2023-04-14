@@ -48,6 +48,7 @@ def create_content_list(queries=NEWS_API_QUERY, domains=WHITELIST, excludeDomain
     content_list = []
     news_articles_list = []
     seen_urls = set() # To prevent duplicate articles
+    goose = Goose()
     for news_query in queries:
         news_articles_list.append(api.get_everything(q=news_query, language='en', domains=domains, exclude_domains=excludeDomains, sort_by='relevancy')) # News Article is a nested dictionary
     index = 0
@@ -61,7 +62,7 @@ def create_content_list(queries=NEWS_API_QUERY, domains=WHITELIST, excludeDomain
                 if url in seen_urls:
                     continue
                 else:
-                    content_list.append(create_row_data(news))
+                    content_list.append(create_row_data(news, goose))
                     seen_urls.add(url)
             except requests.exceptions.ReadTimeout:
                 print('News API Read Timeout')
@@ -70,8 +71,7 @@ def create_content_list(queries=NEWS_API_QUERY, domains=WHITELIST, excludeDomain
                 progress += 1         
     return content_list
 
-def create_row_data(news_article) :
-    g = Goose()
+def create_row_data(news_article, g) :
     title = news_article.get('title')
     date = news_article.get('publishedAt')
     splitdate = date.split('T')
