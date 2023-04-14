@@ -43,12 +43,15 @@ def write_file(path, contents: list) :
         writer.writerow(col_headers)
         writer.writerows(contents)
 
-def create_content_list(queries=NEWS_API_QUERY) :
+def create_content_list(queries=NEWS_API_QUERY, domains=WHITELIST, excludeDomains=BLACKLIST) :
     content_list = []
+    news_articles_list = []
     seen_urls = set() # To prevent duplicate articles
     goose = Goose()
+    for news_query in queries:
+        news_articles_list.append(api.get_everything(q=news_query, language='en', domains=domains, exclude_domains=excludeDomains, sort_by='relevancy'))
     index = 0
-    for news_articles in create_article_list():
+    for news_articles in news_articles_list:
         print(f"Getting article contents for '{queries[index]}'...")
         index += 1
         progress = 1
@@ -63,11 +66,6 @@ def create_content_list(queries=NEWS_API_QUERY) :
             progress += 1         
     return content_list
 
-def create_article_list(queries=NEWS_API_QUERY, domains=WHITELIST, excludeDomains=BLACKLIST) :
-    na_list = []
-    for news_query in queries:
-        na_list.append(api.get_everything(q=news_query, language='en', domains=domains, exclude_domains=excludeDomains, sort_by='relevancy')) # News Article is a nested dictionary
-    return na_list
 
 def row_data(n, g) :
     title = n.get('title')
