@@ -35,8 +35,6 @@ def create_context_csv():
         clean_csv(file_path, embed_file_path)
     else:
         print("This file already exists.")
-        #after file is created, it is cleaned
-        clean_csv(file_path, embed_file_path)
 
 def create_file_path(file_type: str):
         today = datetime.today().strftime('%m-%d-%Y')
