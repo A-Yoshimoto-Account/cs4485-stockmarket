@@ -2,9 +2,12 @@
 **NOTE: Do NOT hardcode any API keys and push them to this repository**
 
 Group repository for UTD SP23 CS 4485 Project: What's Moving the Stock Market Today?
-
 ---
-Before running the app, you must first setup the Docker container for the Milvus vector database.
+To run the app with the startup.py script, please have Docker Desktop started.
+In the main directory, run
+python startup.py 
+---
+If running the app without the startup script, you must first setup the Docker container for the Milvus vector database.
 In the `milvus_db` directory, run the below commands:
 ```
 docker compose up -d
