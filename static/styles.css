@@ -88,10 +88,6 @@ input[type="submit"]{
 	background-color: palevioletred;
 	cursor: pointer;
 }
-input[type="submit"]:hover{
-	background-color: mediumvioletred;
-}
-
 
 /* Spinner */
 .text-area {
