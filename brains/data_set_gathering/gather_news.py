@@ -53,18 +53,14 @@ def create_content_list(queries=NEWS_API_QUERY) :
         index += 1
         progress = 1
         for news in news_articles.get('articles'):
-            try :
-                url = news.get('url') # Checking the URL first can save time when building the dataset and reduce embedding calls
-                if url in seen_urls:
-                    continue
-                else:
-                    content_list.append(row_data(news, goose))
-                    seen_urls.add(url)
-            except requests.exceptions.ReadTimeout:
-                print('News API Read Timeout')
-            finally:
-                print(f"Progress: [{progress}/{len(news_articles.get('articles'))}]", end="\r")
-                progress += 1         
+            url = news.get('url') # Checking the URL first can save time when building the dataset and reduce embedding calls
+            if url in seen_urls:
+                continue
+            else:
+                content_list.append(row_data(news, goose))
+                seen_urls.add(url)
+            print(f"Progress: [{progress}/{len(news_articles.get('articles'))}]", end="\r")
+            progress += 1         
     return content_list
 
 def create_article_list(queries=NEWS_API_QUERY, domains=WHITELIST, excludeDomains=BLACKLIST) :
@@ -79,15 +75,15 @@ def row_data(n, g) :
     splitdate = date.split('T')
     ymd = splitdate[0] # ymd = year month day
     url = n.get('url')
-    content = g.extract(url).cleaned_text
-    return create_row_data(url, title, ymd, content)
-
-def create_row_data(u : str, t : str, y : str, c : str) :
+    try :
+        content = g.extract(url).cleaned_text
+    except requests.exceptions.ReadTimeout:
+        print('Goose Extraction Read Timeout')
     row_data = []
-    row_data.append(u)
-    row_data.append(t)
-    row_data.append(y)
-    row_data.append(c)
+    row_data.append(url)
+    row_data.append(title)
+    row_data.append(ymd)
+    row_data.append(content)
     return row_data
 
 def main() :
