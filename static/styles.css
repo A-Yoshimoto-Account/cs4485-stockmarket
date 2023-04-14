@@ -1,14 +1,21 @@
+body {background-color: darkslategray;}
 .large-container {
 	margin: 3px;
 	padding: 3px;
 }
+
 .header-area * {
+	color:blanchedalmond;
 	margin-bottom: 0px;
 }
 .header-area h3 {
 	margin-top: 5px;
 }
+.footer-area{
+	color:blanchedalmond;
+}
 .param-area * {
+	color:blanchedalmond;
 	margin-top: 0px;
 	margin-bottom: 0px;
 }
@@ -16,18 +23,23 @@
 	margin-bottom: 5px;
 }
 .text-area {
-	border-color: darkgrey;
+	padding: 0px 3px;
 	border: solid 5px;
+	border-color: blanchedalmond;
 	width: 75vw;
 	height: 50vh;
 	font-size: 12pt;
 	overflow: auto;
 }
+.text-field{
+	color:blanchedalmond;
+}
 .query-text {
 	width: 50vw;
 }
 .query-response {
-	margin-bottom: 3px;
+	margin-top: 10px;
+	margin-bottom: 2px;
 }
 .text-block {
 	display: flex;
@@ -46,7 +58,35 @@
 	background-color: lightblue;
 }
 .system-messages {
+	margin-top: 10px;
+	margin-bottom: 5px;
 	background-color: darkorange;
+}
+
+.button_style {
+	background-color: palevioletred;
+	cursor: pointer;
+}
+.button_style:hover{
+	background-color: mediumvioletred;
+}
+.button_style:active{
+	background-color: darkgray;
+
+}
+input::file-selector-button {
+	background-color: palevioletred;
+	cursor: pointer;
+}
+input::file-selector-button:hover{
+	background-color: mediumvioletred;
+}
+input[type="file"]{
+	color:blanchedalmond;
+}
+input[type="submit"]{
+	background-color: palevioletred;
+	cursor: pointer;
 }
 
 /* Spinner */
