@@ -16,7 +16,6 @@ def main():
     time.sleep(60)
     subprocess.check_call(f"python {path_two}\gather_news.py")
     subprocess.check_call("python config_db.py", cwd = path)
-    print(os.getenv('OPENAI_API_KEY'))
     app.run()
 
 if __name__ == '__main__': 
