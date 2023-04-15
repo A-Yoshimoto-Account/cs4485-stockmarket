@@ -37,20 +37,22 @@ def process_question():
 		ksim = int(req_params.get('ksim', 1))
 		memory = int(req_params.get('memory', 0))
 		answer = ''
-		system = ''
+		error = ''
 		try:
 			answer = get_model_response(question, ksim=ksim, memory=memory, refine=app.config['REFINE'])
 		except Exception as e:
+			print(type(e).__name__)
+			print(e)
 			answer = 'Unable to get answer'
 			error = f'{type(e).__name__} was thrown.'
 			if hasattr(e, 'message'):
 				error += f' Message: {e.message}'
-				
-
 		
 		conversation.append({'question': question, 'answer': answer})
-		
-		return jsonify({'answer': answer, 'error': error})
+		resp = {'answer': answer}
+		if error:
+			resp['error'] = error
+		return jsonify(resp)
 
 
 @app.route('/upload_convo', methods=['POST'])
