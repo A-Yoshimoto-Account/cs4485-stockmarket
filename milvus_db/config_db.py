@@ -33,8 +33,10 @@ def create_tables():
     for table_name in table_names:
         print(f'Creating collection {table_name}')
         if utility.has_collection(table_name):
-            print(f'Found existing collection {table_name}: dropping and creating from scratch')
-            utility.drop_collection(table_name)
+            print(f'Found existing collection {table_name}, skipping it\'s creation.')
+            continue
+        else:
+            dbconn_configs['MILVUS-CONN']['updated'] = ''
         table = table_schemas[table_name]
         columns = table['columns']
         col_fields = table['fields']
@@ -76,9 +78,15 @@ def create_tables():
         print('Created table')
         print(collection)
         print()
+    
+    
+
 
 
 def populate_table(table_name: str, text_df: pd.DataFrame, embed_df: pd.DataFrame):
+    if 'updated' in dbconn_configs['MILVUS-CONN'] and dbconn_configs['MILVUS-CONN']['updated'] == datetime.today().strftime('%m-%d-%Y'):
+        print('Database already has been updated for today')
+        return
     col = Collection(table_name)
     context_list = []
     embed_list = []
@@ -92,6 +100,10 @@ def populate_table(table_name: str, text_df: pd.DataFrame, embed_df: pd.DataFram
     print('Inserted data')
     print(resp)
     print()
+
+    dbconn_configs['MILVUS-CONN']['updated'] = datetime.today().strftime('%m-%d-%Y')
+    with open('db-connection.ini', 'w') as file:
+        dbconn_configs.write(file)
 
 def create_file_path(
     type: str
@@ -108,7 +120,6 @@ def main():
     embed_df = pd.read_csv(create_file_path('embeds'))
     populate_table('context_embeddings', text_df, embed_df)
     disconnect_from_db()
-
 
 if __name__ == '__main__':
     main()
