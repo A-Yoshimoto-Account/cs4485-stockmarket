@@ -83,6 +83,9 @@ function updateTextArea() {
 						'</div>';
 					let chatArea = document.getElementById('chat-area');
 					chatArea.innerHTML += html;
+					if ('error' in data) {
+						chatArea.innerHTML += createSystemMessage('error', data['error']);
+					}
 					chatArea.scrollTop = chatArea.scrollHeight;
 					// Re-enable button
 					button.disabled = false;
