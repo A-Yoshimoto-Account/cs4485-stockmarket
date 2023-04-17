@@ -67,20 +67,20 @@ body {background-color: darkslategray;}
 	background-color: palevioletred;
 	cursor: pointer;
 }
-.button_style:hover{
+/* .button_style:hover{
 	background-color: mediumvioletred;
 }
 .button_style:active{
 	background-color: darkgray;
 
-}
+} */
 input::file-selector-button {
 	background-color: palevioletred;
 	cursor: pointer;
 }
-input::file-selector-button:hover{
+/* input::file-selector-button:hover{
 	background-color: mediumvioletred;
-}
+} */
 input[type="file"]{
 	color:blanchedalmond;
 }

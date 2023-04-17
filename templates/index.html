@@ -32,15 +32,15 @@
 			</form>
 		</div>
 		<div class="large-container">
-			<button type="button" class="button_style" onclick="downloadConvo()">Download conversation as CSV file</button>
+			<button id="downBut" type="button" class="button_style" onclick="downloadConvo()">Download conversation as CSV file</button>
 		</div>
 		<div class="large-container">
 			<input type="file" autocomplete="off" id="savedConvoFile" accept=".csv">
-			<button type="button" class="button_style" onclick="uploadSavedConvo()">Upload file as conversation memory</button>
+			<button id = "uploadBut" type="button" class="button_style" onclick="uploadSavedConvo()">Upload file as conversation memory</button>
 		</div>
 		<div class="large-container">
-			<button type="button" class="button_style" onclick="clearMemory()">Clear Current Conversation Memory</button>
-			<button type="button" class="button_style" onclick="clearAll()">Clear Entire Conversation</button>
+			<button id = "clearMemBut" type="button" class="button_style" onclick="clearMemory()">Clear Current Conversation Memory</button>
+			<button id = "clearAllBut" type="button" class="button_style" onclick="clearAll()">Clear Entire Conversation</button>
 		</div>
 		<hr>
 		<div class="large-container footer-area">
