@@ -27,10 +27,20 @@ function submitForm(event) {
 function updateTextArea() {
 	// constants for button disabling
 	const form = document.querySelector('#send-query-form');
-	const button = form.querySelector('input[type="submit"]'); 
+	const subButton = form.querySelector('input[type="submit"]'); 
+	const downloadButton = document.getElementById('downBut');
+	const chooseFileButton = document.getElementById('savedConvoFile');
+	const uploadButton = document.getElementById('uploadBut');
+	const clearMemButton = document.getElementById('clearMemBut');
+	const clearAllButton = document.getElementById('clearAllBut');
 
 	// Disable Button
-	button.disabled = true;
+	subButton.disabled = true;
+	downloadButton.disabled = true;
+	chooseFileButton.disabled = true;
+	uploadButton.disabled = true;
+	clearMemButton.disabled = true;
+	clearAllButton.disabled = true;
 
 	// show spinner
 	document.getElementById("spinner").style.visibility="visible";
@@ -84,8 +94,15 @@ function updateTextArea() {
 					let chatArea = document.getElementById('chat-area');
 					chatArea.innerHTML += html;
 					chatArea.scrollTop = chatArea.scrollHeight;
+
 					// Re-enable button
-					button.disabled = false;
+					subButton.disabled = false;
+					downloadButton.disabled = false;
+					chooseFileButton.disabled = false;
+					uploadButton.disabled = false;
+					clearMemButton.disabled = false;
+					clearAllButton.disabled = false;
+
 					// hide spinner
 					document.getElementById("spinner").style.visibility="hidden";
 				})
