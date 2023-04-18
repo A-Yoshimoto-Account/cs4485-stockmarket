@@ -11,6 +11,7 @@ from datetime import datetime
 import os
 
 config_file = 'db-connection.ini'
+url_file = 'insertedurls.csv'
 dbconn_configs = configparser.ConfigParser()
 dbconn_configs.read(config_file)
 
@@ -90,16 +91,29 @@ def populate_table(table_name: str, text_df: pd.DataFrame, embed_df: pd.DataFram
     col = Collection(table_name)
     context_list = []
     embed_list = []
-
+    url_df = pd.DataFrame(columns=['URL'])
+    if (os.path.isfile(url_file)):
+        url_df = pd.read_csv(url_file)
+    inserted = 0
+    skipped = 0
     for i, row in text_df.iterrows():
+        if (row['URL'] in url_df['URL'].values):
+            skipped += 1
+            continue
         context_list.append(row['context'])
         embed_list.append(embed_df.iloc[i].values)
+        inserted += 1
+        url_df = pd.concat([url_df, pd.DataFrame([[row['URL']]], columns=['URL'])], ignore_index=True)
 
-    data = [context_list, embed_list]
-    resp = col.insert(data)
-    print('Inserted data')
-    print(resp)
-    print()
+    if (context_list):
+        data = [context_list, embed_list]
+        resp = col.insert(data)
+        url_df.to_csv(url_file, index=False)
+        print('Inserted data')
+        print(resp)
+        print()
+    
+    print(f'Inserted {inserted} new articles, skipped {skipped} duplicate articles')
 
     dbconn_configs['MILVUS-CONN']['updated'] = datetime.today().strftime('%m-%d-%Y')
     with open('db-connection.ini', 'w') as file:
