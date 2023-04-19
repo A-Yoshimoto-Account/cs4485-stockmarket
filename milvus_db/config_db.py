@@ -30,10 +30,11 @@ def disconnect_from_db():
 def create_tables():
     table_names = schemas.TABLE_NAMES
     table_schemas = schemas.TABLE_SCHEMAS
-
     for table_name in table_names:
+        print(f'Creating collection {table_name}')
         if utility.has_collection(table_name):
-            continue
+            print(f'Found existing collection {table_name}: dropping and creating from scratch')
+            utility.drop_collection(table_name)
         table = table_schemas[table_name]
         columns = table['columns']
         col_fields = table['fields']
