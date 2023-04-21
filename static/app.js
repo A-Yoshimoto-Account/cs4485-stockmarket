@@ -1,3 +1,6 @@
+/**
+ * @fileoverview This file contains the javascript functions for the chatbot page.
+ */
 function updateKSimValue() {
     let newKSim = document.getElementById('kSimRange').value;
     document.querySelector("span[label='kSimLabel']").innerHTML = newKSim;
@@ -9,10 +12,8 @@ function updateMemoryValue() {
 
 /*
 Connected to Submit button
-
+ Prevent empty submissions
 */
-
-// Prevent empty submissions
 function submitForm(event) {
     event.preventDefault();
     var inputField = document.querySelector(".query-text");
@@ -20,27 +21,18 @@ function submitForm(event) {
         // Submit the form
         document.getElementById("send-query-form").onsubmit();
     } else {
-        // Do nothing or show an error message
+        // Do nothing
     }
 }
-// Submit key function
+/*
+Connected to submit button in form
+Disables buttons and shows spinner while waiting for response
+First endpoint returns the question
+Second endpoint returns the answer
+*/
 function updateTextArea() {
-	// constants for button disabling
-	const form = document.querySelector('#send-query-form');
-	const subButton = form.querySelector('input[type="submit"]'); 
-	const downloadButton = document.getElementById('downBut');
-	const chooseFileButton = document.getElementById('savedConvoFile');
-	const uploadButton = document.getElementById('uploadBut');
-	const clearMemButton = document.getElementById('clearMemBut');
-	const clearAllButton = document.getElementById('clearAllBut');
-
 	// Disable Button
-	subButton.disabled = true;
-	downloadButton.disabled = true;
-	chooseFileButton.disabled = true;
-	uploadButton.disabled = true;
-	clearMemButton.disabled = true;
-	clearAllButton.disabled = true;
+	disableButtons(true);
 
 	// show spinner
 	document.getElementById("spinner").style.visibility="visible";
@@ -99,17 +91,34 @@ function updateTextArea() {
 					chatArea.scrollTop = chatArea.scrollHeight;
 
 					// Re-enable button
-					subButton.disabled = false;
-					downloadButton.disabled = false;
-					chooseFileButton.disabled = false;
-					uploadButton.disabled = false;
-					clearMemButton.disabled = false;
-					clearAllButton.disabled = false;
+					disableButtons(false);
 
 					// hide spinner
 					document.getElementById("spinner").style.visibility="hidden";
 				})
 		})
+}
+
+/*
+Disables buttons on form
+Args: state (boolean) - true to disable, false to enable
+*/
+
+function disableButtons(state) {
+	const form = document.querySelector('#send-query-form');
+	const subButton = form.querySelector('input[type="submit"]'); 
+	const downloadButton = document.getElementById('downBut');
+	const chooseFileButton = document.getElementById('savedConvoFile');
+	const uploadButton = document.getElementById('uploadBut');
+	const clearMemButton = document.getElementById('clearMemBut');
+	const clearAllButton = document.getElementById('clearAllBut');
+
+	subButton.disabled = state;
+	downloadButton.disabled = state;
+	chooseFileButton.disabled = state;
+	uploadButton.disabled = state;
+	clearMemButton.disabled = state;
+	clearAllButton.disabled = state;
 }
 /**
  * creates a CSV file of the text area conversation and download it to the user's browser
