@@ -27,8 +27,10 @@ request_headers = {
 #           We will scrape meta data from the yahoo finace page, scrape the real link, and use the real link to scrape the article content
 # 3 - articles: the article is hosted directly on yahoo finance and no further work is needed
 def explore_articles(article_urls):
+    print("Extracting article content from links")
     articles = [['URL', 'Title', 'Date', 'Content']]
     for url in article_urls:
+        print(f"Trying url '{url}'")
         try:
             if "video" in url:
                 continue
@@ -54,9 +56,11 @@ def explore_articles(article_urls):
             ymd = splitdate[0] # ymd = year month day
               
             articles.append([url, title,  ymd, content])
+            print(f"Info from url '{url}' sucsessfully extracted")
         except Exception:
+            print(f"Error extrating info from url '{url}' Error: {Exception}")
             articles.append(f"Error: {Exception}")
-        
+    print('Done extrating article content from urls')
     return articles
 
 def make_search_query(search_term):
@@ -68,17 +72,24 @@ def make_search_query(search_term):
     service = Service(driver_install)
     options = Options()
     options.add_argument('--headless')
-            
+     
     # Build webdriver to allow search
     driver = webdriver.Chrome(service=service, options=options)
     driver.get(url)
+    # Sleep to allow time for page to fully load
+    sleep(2)
+    
+    print(f"Begining Yahoo Finance Query for {search_term}")
     
     # Load search page
     screen_height = driver.execute_script("return window.screen.height;")
-    for i in range (5):
+    scroll_amount = 5
+    for i in range (scroll_amount):
+        print(f"Progress: {i+1}/{scroll_amount}")
         driver.execute_script("window.scrollTo(0, {screen_height}*{i});".format(screen_height=screen_height, i=i))
         sleep(1)
-
+    print(f"Completed Yahoo Finance Query for {search_term}")
+    print(f"Extrating links from {search_term} query")
     all_items=driver.find_elements(By.TAG_NAME,"a")
     
     links = []
@@ -88,7 +99,7 @@ def make_search_query(search_term):
         link = item.get_attribute('href')
         if 'https://finance.yahoo.com/news/' in link or 'https://finance.yahoo.com/m/' in link:
             links.append(link)
-
+    print(f"Completed link extraction from {search_term} query")
     # We are done with our driver, we are now free to quit
     driver.quit()
     
@@ -98,9 +109,8 @@ def make_search_query(search_term):
 def scrape_yahoo_finance(search_term):
     article_urls = make_search_query(search_term)
     articles = explore_articles(article_urls)
-    
+
     return articles
 
-
-
-
+if __name__ == '__main__':
+    scrape_yahoo_finance('NVDA')

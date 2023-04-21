@@ -12,3 +12,5 @@ python-dotenv==1.0.0
 requests==2.28.2
 setuptools==65.6.3
 tiktoken==0.3.3
+selenium==4.9.0
+webdriver_manager==3.8.6
