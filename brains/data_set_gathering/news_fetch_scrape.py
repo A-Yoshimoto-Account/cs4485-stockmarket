@@ -43,13 +43,17 @@ YAHOO_FINANCE_QUERY = ['NVDA', 'AMD', 'INTC', 'TSMC34.SA', 'QCOM', 'MU']
 # Required to get news articles from news api
 api = NewsApiClient(api_key=os.getenv("NEWS_API_KEY"))
 
+
+
 def create_context_csv():
 
     file_path = create_file_path('context')
     embed_file_path = create_file_path('embeds')
     
-    if not os.path.exists(file_path):
-        write_file(file_path, create_content_list())
+    if not os.path.exists(file_path):    
+        content_list = gather_news()
+        print(f'Obtained {len(content_list)} articles')
+        write_file(file_path, content_list)
         #after file is created, it is cleaned
         clean_csv(file_path, embed_file_path)
     else:
@@ -63,7 +67,7 @@ def create_file_path(file_type: str):
     
 def write_file(path, contents: list) :
     col_headers = ['URL','Title','Date','Content']
-    print('Writing to file..')
+    print('Writing to file')
     with open(path, 'w', newline='', encoding='utf-8') as file:
         writer = csv.writer(file)
         writer.writerow(col_headers)
@@ -82,8 +86,10 @@ def gather_news():
     for search_term in NEWS_API_QUERY:
         content_list += news_api_search_query(search_term)
     
+    scraper_urls = []
     for search_term in YAHOO_FINANCE_QUERY:
-        content_list += yahoo_finance_search_query(search_term)
+        scraper_urls += yahoo_finance_search_query(search_term)
+    content_list += explore_articles(scraper_urls)
     
     return content_list
 
@@ -95,8 +101,7 @@ def news_api_search_query(search_term):
     content_list = []
     news_articles_list = []
     goose = Goose()
-    for news_query in NEWS_API_QUERY:
-        news_articles_list.append(api.get_everything(q=news_query, language='en', domains=WHITELIST, exclude_domains=BLACKLIST, sort_by='relevancy'))
+    news_articles_list.append(api.get_everything(q=search_term, language='en', domains=WHITELIST, exclude_domains=BLACKLIST, sort_by='relevancy'))
     index = 0
     for news_articles in news_articles_list:
         print(f"Getting article contents for '{search_term}'...")
@@ -147,6 +152,7 @@ def yahoo_finance_search_query(search_term):
     service = Service(driver_install)
     options = Options()
     options.add_argument('--headless')
+    options.add_experimental_option('excludeSwitches', ['enable-logging'])
      
     # Build webdriver to allow search
     driver = webdriver.Chrome(service=service, options=options)
@@ -154,7 +160,7 @@ def yahoo_finance_search_query(search_term):
     # Sleep to allow time for page to fully load
     sleep(2)
     
-    print(f"Begining Yahoo Finance Query for {search_term}")
+    print(f"Beginning Yahoo Finance Query for {search_term}")
     
     # Load search page
     screen_height = driver.execute_script("return window.screen.height;")
@@ -164,7 +170,7 @@ def yahoo_finance_search_query(search_term):
         driver.execute_script("window.scrollTo(0, {screen_height}*{i});".format(screen_height=screen_height, i=i))
         sleep(1)
     print(f"Completed Yahoo Finance Query for {search_term}")
-    print(f"Extrating links from {search_term} query")
+    print(f"Extracting links from {search_term} query")
     all_items=driver.find_elements(By.TAG_NAME,"a")
     
     links = []
@@ -194,7 +200,7 @@ our search results contains 3 types of results:
 '''
 def explore_articles(article_urls):
     print("Extracting article content from links")
-    articles = [['URL', 'Title', 'Date', 'Content']]
+    articles = []
     for url in article_urls:
         print(f"Trying url '{url}'")
         try:
@@ -217,23 +223,19 @@ def explore_articles(article_urls):
             content = ''
             for paragraph in paragraphs:
                 content += paragraph.get_text()
-            
+            if 'automation tools to browse' in content:
+                print(f'Access blocked by website for link {url}')
+                continue
             splitdate = publish_date.split('T')
             ymd = splitdate[0] # ymd = year month day
               
             articles.append([url, title,  ymd, content])
             print(f"Info from url '{url}' sucsessfully extracted")
         except Exception:
-            print(f"Error extrating info from url '{url}' Error: {Exception}")
-            articles.append(f"Error: {Exception}")
-    print('Done extrating article content from urls')
+            print(f"Error extracting info from url '{url}' Error: {Exception}")
+            # articles.append(f"Error: {Exception}")
+    print('Done extracting article content from urls')
     return articles
 
-def create_content_list():
-    print(gather_news)
-    pass
-
-
 if __name__ == '__main__':
-    gather_news()
-    #create_context_csv()
+    create_context_csv()
