@@ -61,7 +61,7 @@ def create_context_csv():
 
 def create_file_path(file_type: str):
         today = datetime.today().strftime('%m-%d-%Y')
-        directory = 'milvus_db\initial_data'
+        directory = 'milvus_db/initial_data'
         file_name = f'{file_type}_{today}.csv'
         return os.path.join(directory, file_name)
     
