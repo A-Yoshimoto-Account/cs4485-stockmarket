@@ -1,12 +1,12 @@
 # cs4485-stockmarket 📈
 **NOTE: Do NOT hardcode any API keys and push them to this repository**
 
-Group repository for UTD SP23 CS 4485 Project: What's Moving the Stock Market Today?
+Group repository for UTD SP23 CS 4485 Project: What's Moving the Stock Market Today? (CS-Stock-T1)
+
 ---
-To run the app with the startup.py script, please have Docker Desktop started.
-In the main directory, run
-python startup.py 
----
+An installation manual can be found in the `docs/` directory. It will detail the prerequisites, steps to install, and how to use the program.
+
+
 If running the app without the startup script, you must first setup the Docker container for the Milvus vector database.
 In the `milvus_db` directory, run the below commands:
 ```
@@ -23,15 +23,9 @@ flask run
 ```
 The Flask app will be available on http://localhost:5000
 
-After running `pip install -r requirements.txt`, you can also run the app by running:
-```
-./run.sh
-```
-Be sure execution permissions are set.
+---
+This system uses the OpenAI API, News API, a Selenium web scraper, and Milvus Vector Database to answer questions about the stock market.
 
-The Flask app is a single file module. The packages in this project include code that:
-- accesses articles from the web with News API and web scraping
-- uses a Docker container of the Milvus vector database to store and access text and text embeddings
-- uses the OpenAI Python API to access GPT models
+Currently, it's scope is limited to questions about Nvidia, AMD, Intel, Qualcomm, Micron Technologies, ARM, and the semiconductor industry.
 
-Please have environment variables or a .env for OPENAI_API_KEY and NEWS_API_KEY
+Please note that this system requires OpenAI and NewsAPI keys tied to the user. Please use at your own discretion.
