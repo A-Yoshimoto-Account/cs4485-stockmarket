@@ -4,6 +4,14 @@
 Group repository for UTD SP23 CS 4485 Project: What's Moving the Stock Market Today? (CS-Stock-T1)
 
 ---
+This system uses the OpenAI API, News API, a Selenium web scraper, and Milvus Vector Database to answer questions about the stock market.
+
+Currently, it's scope is limited to questions about Nvidia, AMD, Intel, Qualcomm, Micron Technologies, ARM, and the semiconductor industry.
+
+Please note that this system requires OpenAI and NewsAPI keys tied to the user. Please use at your own discretion.
+
+
+---
 An installation manual can be found in the `docs/` directory. It will detail the prerequisites, steps to install, and how to use the program.
 
 
@@ -22,10 +30,3 @@ pip install .
 flask run
 ```
 The Flask app will be available on http://localhost:5000
-
----
-This system uses the OpenAI API, News API, a Selenium web scraper, and Milvus Vector Database to answer questions about the stock market.
-
-Currently, it's scope is limited to questions about Nvidia, AMD, Intel, Qualcomm, Micron Technologies, ARM, and the semiconductor industry.
-
-Please note that this system requires OpenAI and NewsAPI keys tied to the user. Please use at your own discretion.
