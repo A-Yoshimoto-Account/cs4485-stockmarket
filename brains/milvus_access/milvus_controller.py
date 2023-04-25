@@ -1,102 +1,174 @@
-from typing import List, Any
-
 from pymilvus import connections, Collection, utility
 
-def connect(alias, host, port):
-	connections.connect(
-		alias=alias,
-		host=host,
-		port=port
-	)
+
+def connect(alias, host, port) -> None:
+    """
+    Connects to the Dockerized Milvus database
+    @param alias: name of the Milvus DB instance
+    @param host: host name of Docker container
+    @param port: opened port of Docker container
+    """
+    connections.connect(
+        alias=alias,
+        host=host,
+        port=port
+    )
+
 
 def disconnect(alias):
-	connections.disconnect(alias)
+    """
+    Disconnects from the Dockerized Milvus database
+    @param alias: name of Milvus DB instance
+    """
+    connections.disconnect(alias)
+
 
 # note that Milvus does not update the physical disk immediately, and as a result,
 #	when delete or insert operation are made, the num_entities attribute of Collection
 #	may not immediately reflect the correct value.
 # Milvus does, however, ensure that future accesses to deleted or inserted items are not erroneous
 class _TableController:
-	def __init__(self, name, primary_key):
-		self.name: str = name
-		self.primary_key = primary_key
-		self.collection: Collection = None
+    """
+    A general class that handles operations on a collection
+    It handles:
+    - loading/releasing a table
+    - dropping a table
+    - getting all primary keys
+    - deleting all entries in a table
+    """
 
-	def _check_collection_loaded(func):
-		def wrapper(self, *args, **kwargs):
-			self.check_collection_loaded()
-			return func(self, *args, **kwargs)
-		return wrapper
+    def __init__(self, name, primary_key):
+        """
+        @param name: the name of the table
+        @param primary_key: the primary key of the table
+        """
+        self.name: str = name
+        self.primary_key = primary_key
+        self.collection: Collection = None
 
-	def check_collection_loaded(self):
-		if not self.collection:
-			raise Exception('Please load the collection first before using it')
+    def _check_collection_loaded(func):
+        """
+        A decorator for methods requiring the collection be loaded first
+        """
+        def wrapper(self, *args, **kwargs):
+            self.check_collection_loaded()
+            return func(self, *args, **kwargs)
 
-	def load_collection(self):
-		self.collection = Collection(self.name)
-		self.collection.load()
+        return wrapper
 
-	@_check_collection_loaded
-	def release_collection(self):
-		self.collection.release()
+    def check_collection_loaded(self):
+        """
+        A static method: raises an exception if the collection has not been loaded before usage
+        @raise: Exception for the collection not being loaded
+        """
+        if not self.collection:
+            raise Exception('Please load the collection first before using it')
 
-	@_check_collection_loaded
-	def drop_collection(self):
-		self.release_collection()
-		utility.drop_collection(self.name)
+    def load_collection(self):
+        """
+        Loads the collection into memory
+        """
+        self.collection = Collection(self.name)
+        self.collection.load()
 
-	@_check_collection_loaded
-	def delete_all(self):
-		pks = self.get_all_primary_keys()
-		if pks:
-			self.collection.delete(f'{self.primary_key} in {pks}')
+    @_check_collection_loaded
+    def release_collection(self):
+        """
+        Releases the collection from memory
+        """
+        self.collection.release()
 
-	@_check_collection_loaded
-	def get_all_primary_keys(self):
-		results = self.collection.query(f'{self.primary_key} >= 0')
-		return [res[self.primary_key] for res in results]
+    @_check_collection_loaded
+    def drop_collection(self):
+        """
+        Removes the collection from the database
+        """
+        self.release_collection()
+        utility.drop_collection(self.name)
 
-	_check_collection_loaded = staticmethod(_check_collection_loaded)
+    @_check_collection_loaded
+    def delete_all(self):
+        """
+        Deletes all entries in a collection
+        """
+        pks = self.get_all_primary_keys()
+        if pks:
+            self.collection.delete(f'{self.primary_key} in {pks}')
+
+    @_check_collection_loaded
+    def get_all_primary_keys(self) -> list:
+        """
+        @return: list of primary keys in the collection
+        """
+        results = self.collection.query(f'{self.primary_key} >= 0')
+        return [res[self.primary_key] for res in results]
+
+    _check_collection_loaded = staticmethod(_check_collection_loaded)
+
 
 class TextEmbeddingTableController(_TableController):
-	def __init__(self, name: str, primary_key: str, text_col: str, embed_col: str):
-		super().__init__(name, primary_key)
-		self.text_col = text_col
-		self.embed_col = embed_col
+    """
+    A class handling operations on a collection containing text and their vector embeddings
+    """
+    def __init__(self, name: str, primary_key: str, text_col: str, embed_col: str):
+        """
+        @param name: name of collection
+        @param primary_key: column name of primary key
+        @param text_col: column name of text
+        @param embed_col: column name of vector embeddings
+        """
+        super().__init__(name, primary_key)
+        self.text_col = text_col
+        self.embed_col = embed_col
 
-	@_TableController._check_collection_loaded
-	def insert(
-			self,
-			text_list: list,
-			embedding_list: list
-	):
-		data = [text_list, embedding_list]
-		resp = self.collection.insert(data)
-		return resp
+    @_TableController._check_collection_loaded
+    def insert(
+            self,
+            text_list: list,
+            embedding_list: list
+    ):
+        """
+        Inserts text-embeddings pairs into the collection
+        @param text_list: the list of text to insert
+        @param embedding_list: the list of embeddings to insert
+        @return: the response generated by Milvus DB
+        """
+        data = [text_list, embedding_list]
+        resp = self.collection.insert(data)
+        return resp
 
-	@_TableController._check_collection_loaded
-	def get_similar_contexts(
-			self,
-			query_embeds: list,
-			nprobe: int = 16,
-			limit: int = 15
-	) -> list:
-		search_params = {"metric_type": "IP", "params": {"nprobe": nprobe}, "offset": 0}
-		res_ids = self.collection.search(
-			data=query_embeds, 
-			anns_field=self.embed_col,
-			param=search_params,
-			limit=limit,
-			expr=None,
-			consistency_level="Strong",
-		)
-		results = self.collection.query(
-			expr=f"{self.primary_key} in {res_ids[0].ids}",
-			offset=0,
-			limit=limit,
-			output_fields=[self.text_col],
-			consistency_level="Strong"
-		)
-		resp = [res[self.text_col] for res in results]
-		return resp
-
+    @_TableController._check_collection_loaded
+    def get_similar_contexts(
+            self,
+            query_embeds: list,
+            nprobe: int = 16,
+            limit: int = 15
+    ) -> list:
+        """
+        Returns the texts with the closest associated embeddings to the parameter embeddings query_embeds
+        @param query_embeds: the embeddings to perform similarity search with
+        @param nprobe: the number cell to look in
+        @param limit: the number of most similar results to return
+        @return: a list of the most similar texts to the given query_embeds
+        """
+        search_params = {"metric_type": "IP", "params": {"nprobe": nprobe}, "offset": 0}
+        # gets the primary keys of the most similar
+        res_ids = self.collection.search(
+            data=query_embeds,
+            anns_field=self.embed_col,
+            param=search_params,
+            limit=limit,
+            expr=None,
+            consistency_level="Strong",
+        )
+        # gets the text columns of the obtained primary keys
+        results = self.collection.query(
+            expr=f"{self.primary_key} in {res_ids[0].ids}",
+            offset=0,
+            limit=limit,
+            output_fields=[self.text_col],
+            consistency_level="Strong"
+        )
+        # puts the text into a list
+        resp = [res[self.text_col] for res in results]
+        return resp
