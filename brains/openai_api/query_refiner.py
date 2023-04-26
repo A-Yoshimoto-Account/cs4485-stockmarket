@@ -9,6 +9,20 @@ REFINE_TYPES = ['list']
 # implement LlamaIndex list index for refining queries to OpenAI
 # called by ModelController
 class QueryRefiner:
+    """_summary_ Refine a query to OpenAI.
+    Args:
+        openai_controller (OpenAIController): The instance of the OpenAIController class.
+        type (str): The type of refinement to use.
+        endpoint (str): The OpenAI endpoint to use for answering.
+        model (str): The OpenAI model to use for answering.
+        question (str): The question to ask the model.
+        context_list (list[str]): The list of contexts to use for refinement.
+        memory (list[dict[str, str]]): The previous questions to use as context.
+        kwargs (dict): Additional arguments to pass to the refinement function.
+        
+    Returns:
+        QueryRefiner._list_query().
+    """
     def query(
             openai_controller: OpenAIController,
             type: str,
@@ -34,7 +48,20 @@ class QueryRefiner:
                 memory=memory,
                 **kwargs
             )
-
+    """
+    _summary_ Refine a query to OpenAI using a list of contexts, one at a time (in random order).
+    Args:
+        opoenai_controller (OpenAIController): The instance of the OpenAIController class.
+        endpoint (str): The OpenAI endpoint to use for answering.
+        model (str): The OpenAI model to use for answering.
+        question (str): The question to ask the model.
+        context_list (list[str]): The list of contexts to use for refinement.
+        memory (list[dict[str, str]]): The previous questions to use as context.
+        kwargs (dict): Additional arguments to pass to the refinement function.
+        
+    Returns:
+        context_answer (str): The response contextualized from the model.
+    """
     def _list_query(
             openai_controller: OpenAIController,
             endpoint: str,
