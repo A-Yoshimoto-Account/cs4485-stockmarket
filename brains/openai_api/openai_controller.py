@@ -67,6 +67,16 @@ class OpenAIController:
         self.disable_completions = disable_completions
         self.prompter = OpenAIPromptCreator(**kwargs)
 
+        """_summary_ = 'OpenAI API Controller' Accessing the model based on the endpoint and model name
+        Args:
+        self (OpenAIController): OpenAIController object
+        endpoint (str): The endpoint to access
+        model (str): The model to use
+        kwargs: The parameters to pass to the endpoint
+        
+        Returns:
+        Response from the OpenAI API endpoint
+        """
     def access_model(
             self,
             endpoint: str,
@@ -89,6 +99,12 @@ class OpenAIController:
                 raise Exception('ChatCompletions endpoint needs parameters "question", "context", "memory"')
             return self._chat_completion(model, kwargs['question'], kwargs['context'], kwargs['memory'])
 
+    """_summary_ = Accessing the embedding model
+    Args:
+    self (OpenAIController): OpenAIController object
+    model (str): The model to use
+    text (str): The text to embed
+    """
     @openai_error_handler
     def _embedding(
             self,
@@ -103,6 +119,16 @@ class OpenAIController:
         )
         return [data['embedding'] for data in resp['data']]
 
+    """_summary_ = Accessing the completion model
+    Args:
+    self (OpenAIController): OpenAIController object
+    model (str): The model to use
+    question (str): The question to ask
+    context (str): The context to use
+    
+    Returns:
+    response from the OpenAI API endpoint
+    """
     @openai_error_handler
     def _completion(
             self,
@@ -120,6 +146,17 @@ class OpenAIController:
         )
         return resp['choices'][0]['text']
 
+    """_summary_ = Accessing the chat completion model
+    Args:
+    self (OpenAIController): OpenAIController object
+    model (str): The model to use
+    question (str): The question to ask
+    context (str): The context to use
+    memory (list[dict[str, str]]): The memory to use
+    
+    Returns:
+    response from the OpenAI API endpoint
+    """
     @openai_error_handler
     def _chat_completion(
             self,
@@ -137,6 +174,7 @@ class OpenAIController:
         )
         return resp['choices'][0]['message']['content']
 
+    """_summary_ = Placeholder response for when completions are disabled"""
     def _placeholder_response(
             question: str
     ) -> str:
