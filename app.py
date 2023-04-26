@@ -99,7 +99,17 @@ def upload_convo():
 		'content': content
 	})
 
-
+'''
+Returns the response from the model.
+Args:
+	question (str): The question to ask the model.
+	ksim (int): The number of similiar articles to refine answer.
+	memory (int): The number of previous questions to use as context.
+    refine (str): The type of refinement to use.
+    
+Returns:
+   OpenAI response (str): The response from the model.
+'''
 def get_model_response(
 		question,
 		ksim=1,

@@ -21,6 +21,20 @@ class ModelController:
 		)
 		self.milvus_access.load_collection()
 
+		"""_summary_ Ask a question to the model and return the response.
+		Args:
+			self (ModelController): The instance of the class.
+			answering_endpoint (str): The OpenAI endpoint to use for answering.
+			answering_model (str): The OpenAI model to use for answering.
+			question (str): The question to ask the model.
+			ksim (int): The number of similiar articles to refine answer.
+			memory (list[dict[str, str]]): The previous questions to use as context.
+			refine (str): The type of refinement to use.
+		Returns:
+			OpenAI response (str): The response from the model.
+			or
+			QueryRefiner response (str): The response from the model.
+		"""
 	def ask_question(
 			self,
 			answering_endpoint: str,

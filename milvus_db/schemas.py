@@ -1,5 +1,9 @@
 from pymilvus import DataType
 
+"""
+This file contains the database schemas for the Milvus vector database
+"""
+
 TABLE_NAMES = [
 	'context_embeddings',
 	'question_embeddings',
