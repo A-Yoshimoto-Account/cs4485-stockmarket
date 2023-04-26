@@ -40,6 +40,7 @@ def openai_error_handler(
                 rle_retries += 1
                 if rle_retries > rle_max_retries:
                     raise Exception(f'Exceeded maximum number of retries ({rle_max_retries})')
+                print(e)
                 print(f'RateLimitError: Sleeping for {delay} seconds')
                 time.sleep(delay)
                 delay *= expo_base

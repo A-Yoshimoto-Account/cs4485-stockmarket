@@ -3,6 +3,8 @@ CHAT_SYSTEM = 'You are a stock market analyst focused on the graphics card indus
 COMPLETION_PROMPT = ''
 COMPLETION_STOP = ''
 
+from datetime import datetime
+
 class OpenAIPromptCreator:
     def __init__(self, **kwargs):
         self.system = None if 'system' not in kwargs else kwargs['system']
@@ -28,7 +30,9 @@ class OpenAIPromptCreator:
     ) ->  list[dict]:
         messages = [{
             'role': 'system',
-            'content': f'{CHAT_SYSTEM if self.system is None else self.system}'
+            'content': f'{CHAT_SYSTEM if self.system is None else self.system}',
+            'role': 'assistant',
+            'content': f'Today\'s date is {datetime.today().strftime("%B %d, %Y")}',
         }]
         for interaction in memory:
             messages.append({
