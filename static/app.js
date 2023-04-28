@@ -1,3 +1,6 @@
+/**
+ * @fileoverview This file contains the javascript functions for the chatbot page.
+ */
 function updateKSimValue() {
     let newKSim = document.getElementById('kSimRange').value;
     document.querySelector("span[label='kSimLabel']").innerHTML = newKSim;
@@ -9,26 +12,52 @@ function updateMemoryValue() {
 
 /*
 Connected to Submit button
-
+ Prevent empty submissions
 */
-// Submit key function
+function submitForm(event) {
+    event.preventDefault();
+    var inputField = document.querySelector(".query-text");
+    if (inputField.value.trim() !== "") {
+        // Submit the form
+        document.getElementById("send-query-form").onsubmit();
+    } else {
+        // Do nothing
+    }
+}
+/*
+Connected to submit button in form
+Disables buttons and shows spinner while waiting for response
+First endpoint returns the question
+Second endpoint returns the answer
+*/
 function updateTextArea() {
-	let data = {
+	// Disable Button
+	disableButtons(true);
+
+	// show spinner
+	document.getElementById("spinner").style.visibility="visible";
+	// gather arguments for endpoints
+	let data1 = {
+		'question': document.querySelector("input[name='question']").value,
+	};
+	let data2 = {
 		'question': document.querySelector("input[name='question']").value,
 		'ksim': document.getElementById('kSimRange').value,
 		'memory': document.getElementById('memoryRange').value,
 	};
 	document.querySelector("input[name='question']").value = '';
-	console.log(data);
+	console.log(data2);
 
 	//Sets endpoint
-	const url = '/process_question';
+	const url1 = 'post_user_question';
+	const url2 = '/process_question';
 	
-	//calls the endpoint
-	fetch(url, {
+	//calls the endpoints
+	// first endpoint returns the question
+	fetch(url1, {
 		'method': 'POST',
 		'headers': {'Content-Type': 'application/json'},
-		'body': JSON.stringify(data)
+		'body': JSON.stringify(data1)
 	})
 		.then(response => response.json())
 		.then(data => {
@@ -36,15 +65,60 @@ function updateTextArea() {
 				'<div class="query-response">' + 
 				'	<div class="user-queries text-block">' + 
 				'		<b>You:&nbsp</b><p>' + data['question'] + '</p>' +
-				'	</div>' + 
-				'	<div class="model-responses text-block">' + 
-				'		<b>Response:&nbsp</b><p>' + data['answer'] + '</p>' + 
-				'	</div>' + 
+				'	</div>' +
 				'</div>';
 			let chatArea = document.getElementById('chat-area');
 			chatArea.innerHTML += html;
 			chatArea.scrollTop = chatArea.scrollHeight;
+			// then the second endpoint returns the answer
+			return 	fetch(url2, {
+				'method': 'POST',
+				'headers': {'Content-Type': 'application/json'},
+				'body': JSON.stringify(data2)
+			})
+				.then(response => response.json())
+				.then(data => {
+					let html = 
+						'	<div class="model-responses text-block">' + 
+						'		<b>Response:&nbsp</b><p>' + data['answer'] + '</p>' + 
+						'	</div>' + 
+						'</div>';
+					let chatArea = document.getElementById('chat-area');
+					chatArea.innerHTML += html;
+					if ('error' in data) {
+						chatArea.innerHTML += createSystemMessage('error', data['error']);
+					}
+					chatArea.scrollTop = chatArea.scrollHeight;
+
+					// Re-enable button
+					disableButtons(false);
+
+					// hide spinner
+					document.getElementById("spinner").style.visibility="hidden";
+				})
 		})
+}
+
+/*
+Disables buttons on form
+Args: state (boolean) - true to disable, false to enable
+*/
+
+function disableButtons(state) {
+	const form = document.querySelector('#send-query-form');
+	const subButton = form.querySelector('input[type="submit"]'); 
+	const downloadButton = document.getElementById('downBut');
+	const chooseFileButton = document.getElementById('savedConvoFile');
+	const uploadButton = document.getElementById('uploadBut');
+	const clearMemButton = document.getElementById('clearMemBut');
+	const clearAllButton = document.getElementById('clearAllBut');
+
+	subButton.disabled = state;
+	downloadButton.disabled = state;
+	chooseFileButton.disabled = state;
+	uploadButton.disabled = state;
+	clearMemButton.disabled = state;
+	clearAllButton.disabled = state;
 }
 /**
  * creates a CSV file of the text area conversation and download it to the user's browser
@@ -207,7 +281,7 @@ function clearAll() {
 				'</div>';
 	chatArea.innerHTML += html;
 	chatArea.scrollTop = chatArea.scrollHeight;
-	setTimeout(function() {document.getElementById('chat-area').innerHTML = '';} , 5000);
+	setTimeout(function() {document.getElementById('chat-area').innerHTML = '';} , 2500);
 }
 /**
  * Takes in a system message type and a system message to
@@ -240,3 +314,8 @@ function createConvoElement(question, answer) {
 			'	</div>' + 
 			'</div>';
 }
+
+// This is the code that runs when the page loads
+window.addEventListener("load", function() {
+	document.getElementById("spinner").style.visibility = "hidden";
+  });

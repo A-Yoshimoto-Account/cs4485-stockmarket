@@ -19,25 +19,28 @@
 			<p>Conversation memory: <span label="memoryLabel">3</span></p>
 			<input autocomplete="off" type="range" min="1" max="5" value="3" class="slider" id="memoryRange" oninput="updateMemoryValue()">
 		</div>
-		<div class="text-area large-container" id="chat-area">
+		<div class="large-container" id="spinner-container">
+			<img id="spinner" src="static\Spinner-1s-235px.gif">
+			<div class="text-area large-container" id="chat-area">
+			</div>
 		</div>
 		<div class="text-field large-container">
-			<form id="send-query-form" onsubmit="this.reset();return false;">
+			<form id="send-query-form" onsubmit="updateTextArea();">
 				<label for="text">Talk with the model</label><br>
-				<input autocomplete="off" class="query-text" type="text" name="question">
-				<input type="submit" value="Submit" onclick="updateTextArea()">
+				<input autocomplete="off" class="query-text" type="text" name="question" placeholder="Please type your question here.">
+				<input type="submit" value="Submit" onclick="submitForm(event)">
 			</form>
 		</div>
 		<div class="large-container">
-			<button type="button" onclick="downloadConvo()">Download conversation as CSV file</button>
+			<button id="downBut" type="button" class="button_style" onclick="downloadConvo()">Download conversation as CSV file</button>
 		</div>
 		<div class="large-container">
 			<input type="file" autocomplete="off" id="savedConvoFile" accept=".csv">
-			<button type="button" onclick="uploadSavedConvo()">Upload file as conversation memory</button>
+			<button id = "uploadBut" type="button" class="button_style" onclick="uploadSavedConvo()">Upload file as conversation memory</button>
 		</div>
 		<div class="large-container">
-			<button type="button" onclick="clearMemory()">Clear Current Conversation Memory</button>
-			<button type="button" onclick="clearAll()">Clear Entire Conversation</button>
+			<button id = "clearMemBut" type="button" class="button_style" onclick="clearMemory()">Clear Current Conversation Memory</button>
+			<button id = "clearAllBut" type="button" class="button_style" onclick="clearAll()">Clear Entire Conversation</button>
 		</div>
 		<hr>
 		<div class="large-container footer-area">

@@ -19,6 +19,15 @@ def index():
 
 
 #Part of Submit function
+# First endpoint to be called when user submits a question
+@app.route('/post_user_question', methods=['POST', 'GET'])
+def post_user_question():
+    if request.method == 'POST': 
+        req_params: dict = request.get_json()
+        question = req_params.get('question', '')
+        return jsonify({'question': question})
+    
+# Second endpoint to be called after user question posts to UI
 @app.route('/process_question', methods=['POST', 'GET'])
 def process_question():
 	if request.method == 'POST':
@@ -27,12 +36,23 @@ def process_question():
 		question = req_params.get('question', '')
 		ksim = int(req_params.get('ksim', 1))
 		memory = int(req_params.get('memory', 0))
-		
-		answer = get_model_response(question, ksim=ksim, memory=memory, refine=app.config['REFINE'])
+		answer = ''
+		error = ''
+		try:
+			answer = get_model_response(question, ksim=ksim, memory=memory, refine=app.config['REFINE'])
+		except Exception as e:
+			print(type(e).__name__)
+			print(e)
+			answer = 'Unable to get answer'
+			error = f'{type(e).__name__} was thrown.'
+			if hasattr(e, 'message'):
+				error += f' Message: {e.message}'
 		
 		conversation.append({'question': question, 'answer': answer})
-		
-		return jsonify({'question': question, 'answer': answer})
+		resp = {'answer': answer}
+		if error:
+			resp['error'] = error
+		return jsonify(resp)
 
 
 @app.route('/upload_convo', methods=['POST'])
@@ -79,7 +99,17 @@ def upload_convo():
 		'content': content
 	})
 
-
+'''
+Returns the response from the model.
+Args:
+	question (str): The question to ask the model.
+	ksim (int): The number of similiar articles to refine answer.
+	memory (int): The number of previous questions to use as context.
+    refine (str): The type of refinement to use.
+    
+Returns:
+   OpenAI response (str): The response from the model.
+'''
 def get_model_response(
 		question,
 		ksim=1,
