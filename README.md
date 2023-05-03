@@ -1,6 +1,8 @@
 # cs4485-stockmarket 📈
 **NOTE: Do NOT hardcode any API keys and push them to this repository**
 
+An installation manual can be found in the `docs/` directory. It will detail the prerequisites, steps to install, and how to use the program.
+
 Group repository for UTD SP23 CS 4485 Project: What's Moving the Stock Market Today? (CS-Stock-T1)
 
 ---
@@ -12,9 +14,6 @@ Please note that this system requires OpenAI and NewsAPI keys tied to the user. 
 
 
 ---
-An installation manual can be found in the `docs/` directory. It will detail the prerequisites, steps to install, and how to use the program.
-
-
 If running the app without the startup script, you must first setup the Docker container for the Milvus vector database.
 In the `milvus_db` directory, run the below commands:
 ```
